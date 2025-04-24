@@ -22,8 +22,6 @@ export const encryptValue = async ({ value, address, contractAddress }) => {
 
   const incoConfig = await getConfig();
 
-  await new Promise((resolve) => setTimeout(resolve, 10000)); // Wait for the transfer to be processed
-  console.log(incoConfig);
   const encryptedData = await incoConfig.encrypt(valueBigInt, {
     accountAddress: address,
     dappAddress: checksummedAddress,
@@ -31,7 +29,7 @@ export const encryptValue = async ({ value, address, contractAddress }) => {
 
   console.log("Encrypted data:", encryptedData);
 
-  return { inputCt: encryptedData };
+  return encryptedData;
 };
 
 /**
@@ -50,7 +48,6 @@ export const reEncryptValue = async ({ walletClient, handle }) => {
   try {
     const incoConfig = await getConfig();
     const reencryptor = await incoConfig.getReencryptor(walletClient.data);
-    await new Promise((resolve) => setTimeout(resolve, 10000)); // Wait for the transfer to be processed
 
     const decryptedResult = await reencryptor({
       handle: handle.toString(),

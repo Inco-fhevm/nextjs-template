@@ -37,11 +37,13 @@ const EncryptedSend = () => {
     try {
       let parsedAmount = parseEther(amount);
       // Encrypt the value
-      const { inputCt } = await encryptValue({
+      const encryptedData = await encryptValue({
         value: parsedAmount,
         address: address,
         contractAddress: ENCRYPTED_ERC20_CONTRACT_ADDRESS,
       });
+
+      console.log(encryptedData);
 
       const hash = await writeContractAsync({
         address: ENCRYPTED_ERC20_CONTRACT_ADDRESS,
@@ -72,7 +74,7 @@ const EncryptedSend = () => {
           },
         ],
         functionName: "transfer",
-        args: [receiverAddress, inputCt.ciphertext.value],
+        args: [receiverAddress, encryptedData],
       });
 
       const transaction = await publicClient.waitForTransactionReceipt({
