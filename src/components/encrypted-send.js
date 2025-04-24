@@ -6,7 +6,7 @@ import {
   useWriteContract,
 } from "wagmi";
 import { Send, ArrowRight } from "lucide-react";
-import { getConfig, encryptValue } from "@/utils/inco-lite";
+import { encryptValue } from "@/utils/inco-lite";
 import { parseEther } from "viem";
 import { ENCRYPTED_ERC20_CONTRACT_ADDRESS } from "@/utils/contract";
 
@@ -19,7 +19,6 @@ const EncryptedSend = () => {
 
   const { writeContractAsync } = useWriteContract();
   const publicClient = usePublicClient();
-  const chainId = useChainId();
 
   const send = async () => {
     if (!amount || Number(amount) <= 0) {
@@ -37,14 +36,10 @@ const EncryptedSend = () => {
 
     try {
       let parsedAmount = parseEther(amount);
-      // config
-      const config = getConfig(chainId);
-
       // Encrypt the value
       const { inputCt } = await encryptValue({
         value: parsedAmount,
         address: address,
-        config: config,
         contractAddress: ENCRYPTED_ERC20_CONTRACT_ADDRESS,
       });
 

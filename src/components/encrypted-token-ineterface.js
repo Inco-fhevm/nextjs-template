@@ -41,7 +41,7 @@ const EncryptedTokenInterface = () => {
         address: ENCRYPTED_ERC20_CONTRACT_ADDRESS,
         abi: ENCRYPTEDERC20ABI,
         functionName: "mint",
-        args: [address, parseEther(amount.toString())],
+        args: [parseEther(amount.toString())],
       });
 
       const tx = await publicClient.waitForTransactionReceipt({
