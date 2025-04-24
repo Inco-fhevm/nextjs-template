@@ -19,7 +19,7 @@ export const encryptValue = async ({ value, address, contractAddress }) => {
 
   // Format the contract address to checksum format for standardization
   const checksummedAddress = getAddress(contractAddress);
-  
+
   const incoConfig = await getConfig();
 
   await new Promise((resolve) => setTimeout(resolve, 10000)); // Wait for the transfer to be processed
@@ -35,19 +35,6 @@ export const encryptValue = async ({ value, address, contractAddress }) => {
 };
 
 /**
- *
- * This function takes an encrypted value handle and performs reencryption
- * through the KMS service, then decrypts it to obtain the original value.
- *
- * @param {Object} params - The reencryption parameters
- * @param {bigint} params.chainId - The ID of the chain
- * @param {Object} params.walletClient - The wallet client for authentication
- * @param {Object} params.handle - The handle of the encrypted value to decrypt
- *
- * @returns {Promise<string>} The decrypted value formatted as a string
- *
- * @throws {Error} If any required parameters are missing or if reencryption fails
- *
  * @example
  * const decryptedValue = await reEncryptValue({
  *   walletClient: yourWalletClient,
