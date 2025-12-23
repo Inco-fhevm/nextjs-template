@@ -1,5 +1,5 @@
 import { CERC_ABI, CERC_CONTRACT_ADDRESS } from "@/utils/constants";
-import { decryptValue, IncoWalletClient } from "@/utils/inco";
+import { decryptValue } from "@/utils/inco";
 import React, { useState } from "react";
 import { formatEther } from "viem";
 import { useAccount, usePublicClient, useWalletClient } from "wagmi";
@@ -37,7 +37,22 @@ const Balance = () => {
     setBalance(formattedBalance);
   };
 
-  return <div>Balance {balance}cUSDC <button onClick={handleReadBalance}>Read Balance</button></div>;
+  return (
+    <div className="mt-8 space-y-4">
+      <div className="flex items-center justify-between">
+        <div>
+          <span className="text-sm font-medium">Balance:</span>
+          <span className="ml-2 font-mono">{balance || "0"} cUSDC</span>
+        </div>
+        <button
+          onClick={handleReadBalance}
+          className="bg-gray-600 text-white py-2 px-4 rounded-full hover:bg-gray-700 transition-colors"
+        >
+          Refresh
+        </button>
+      </div>
+    </div>
+  );
 };
 
 export default Balance;

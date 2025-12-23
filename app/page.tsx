@@ -9,8 +9,10 @@ const Page = () => {
   return (
     <Padder>
       <Header />
-      <EncryptedInput />
-      <Balance />
+      <div className="max-w-md mx-auto">
+        <EncryptedInput />
+        <Balance />
+      </div>
     </Padder>
   );
 };
