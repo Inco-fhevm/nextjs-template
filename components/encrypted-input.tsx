@@ -1,7 +1,7 @@
-import { useState } from "react";
-import { encryptValue } from "@/utils/inco";
+import { useEffect, useState } from "react";
+import { encryptValue, getFee } from "@/utils/inco";
 import Mint from "./mint";
-import { parseEther } from "viem";
+import { formatEther, parseEther } from "viem";
 import { useAccount } from "wagmi";
 import { CERC_CONTRACT_ADDRESS } from "@/utils/constants";
 
@@ -9,6 +9,15 @@ const EncryptedInput = () => {
   const [value, setValue] = useState("");
   const [encryptedValue, setEncryptedValue] = useState<string>("");
   const { address } = useAccount();
+  const [fee, setFee] = useState<string>("0");
+  
+  useEffect(() => {
+    const fetchFee = async () => {
+      const fee = await getFee();
+      setFee(formatEther(fee).toString());
+    };
+    fetchFee();
+  }, []);
 
   const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     setValue(e.target.value);
@@ -41,7 +50,10 @@ const EncryptedInput = () => {
       )}
 
       {encryptedValue && (
-        <Mint encryptedValue={encryptedValue as `0x${string}`} />
+        <div>
+          <Mint encryptedValue={encryptedValue as `0x${string}`} />
+          <p>for minting you will need {fee} ETH on base Sepolia</p>
+        </div>
       )}
     </div>
   );
