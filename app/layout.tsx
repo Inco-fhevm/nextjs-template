@@ -21,7 +21,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${urbanist.variable} font-sans antialiased`}>
+      <body className={`${urbanist.variable} font-sans antialiased`} suppressHydrationWarning>
         <WalletProvider>{children}</WalletProvider>
       </body>
     </html>

@@ -4,7 +4,7 @@ import type { WalletClient, Transport, Account, Chain } from "viem";
 import { bytesToHex, createPublicClient, http, pad, toHex } from "viem";
 import { baseSepolia } from "viem/chains";
 
-type IncoWalletClient = WalletClient<Transport, Chain, Account>;
+export type IncoWalletClient = WalletClient<Transport, Chain, Account>;
 
 export const publicClient = createPublicClient({
   chain: baseSepolia,
