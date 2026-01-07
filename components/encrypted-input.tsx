@@ -1,9 +1,5 @@
 import { useEffect, useState } from "react";
-import { encryptValue, getFee } from "@/utils/inco";
 import Mint from "./mint";
-import { formatEther, parseEther } from "viem";
-import { useAccount } from "wagmi";
-import { CERC_CONTRACT_ADDRESS } from "@/utils/constants";
 
 const EncryptedInput = () => {
   const [value, setValue] = useState("");
@@ -11,15 +7,11 @@ const EncryptedInput = () => {
   const [showFullEncrypted, setShowFullEncrypted] = useState(false);
   const [txHash, setTxHash] = useState<`0x${string}` | null>(null);
   const [isEncrypting, setIsEncrypting] = useState(false);
-  const { address } = useAccount();
   const [fee, setFee] = useState<string>("0");
 
   useEffect(() => {
-    const fetchFee = async () => {
-      const fee = await getFee();
-      setFee(formatEther(fee).toString());
-    };
-    fetchFee();
+    // Empty effect - logic removed
+    setFee("0");
   }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -29,16 +21,12 @@ const EncryptedInput = () => {
   };
 
   const handleEncrypt = async () => {
-    if (!value || !address) return;
+    if (!value) return;
 
     setIsEncrypting(true);
     try {
-      const encryptedVal = await encryptValue({
-        value: parseEther(value),
-        address: address as `0x${string}`,
-        contractAddress: CERC_CONTRACT_ADDRESS,
-      });
-      setEncryptedValue(encryptedVal);
+      // Empty function - logic removed
+      setEncryptedValue("0xencryptedvalueplaceholder");
     } catch (error) {
       console.error("Encryption failed:", error);
     } finally {
@@ -67,7 +55,7 @@ const EncryptedInput = () => {
   };
 
   const getExplorerUrl = (hash: string) => {
-    return `https://sepolia.basescan.org/tx/${hash}`;
+    return `https://explorer.solana.com/tx/${hash}`;
   };
 
   return (
@@ -128,7 +116,7 @@ const EncryptedInput = () => {
             onMintSuccess={handleMintSuccess}
           />
           <p className="text-sm text-gray-600">
-            Fee: {fee} ETH on Base Sepolia
+            Fee: {fee} SOL on Solana
           </p>
         </div>
       )}

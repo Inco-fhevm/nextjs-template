@@ -1,7 +1,3 @@
-import { CERC_ABI, CERC_CONTRACT_ADDRESS } from "@/utils/constants";
-import { getFee, publicClient } from "@/utils/inco";
-import { useWriteContract } from "wagmi";
-
 const Mint = ({
   encryptedValue,
   onMintSuccess,
@@ -9,29 +5,10 @@ const Mint = ({
   encryptedValue: `0x${string}`;
   onMintSuccess?: (txHash: `0x${string}`) => void;
 }) => {
-  const { writeContractAsync } = useWriteContract();
   const handleMint = async () => {
-    const fee = await getFee();
-    console.log("Fee: ", fee);
-    const hash = await writeContractAsync({
-      address: CERC_CONTRACT_ADDRESS,
-      abi: CERC_ABI,
-      functionName: "encryptedMint",
-      args: [encryptedValue],
-      value: fee,
-    });
-
-    const receipt = await publicClient.waitForTransactionReceipt({
-      hash: hash,
-    });
-
-    if (receipt.status !== "success") {
-      throw new Error("Transaction failed");
-    }
-
-    console.log("Receipt: ", receipt);
-    // Pass transaction hash to parent for display
-    onMintSuccess?.(hash);
+    // Empty function - logic removed
+    // Pass fake transaction hash to parent for display
+    onMintSuccess?.("0x1234567890abcdef" as `0x${string}`);
   };
   return (
     <button
