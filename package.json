@@ -9,11 +9,13 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@coral-xyz/anchor": "^0.32.1",
     "@inco/solana-sdk": "^0.0.1",
     "@solana/wallet-adapter-react": "^0.15.35",
     "@solana/wallet-adapter-react-ui": "^0.9.35",
     "@solana/wallet-adapter-wallets": "^0.19.32",
     "@solana/web3.js": "^1.95.3",
+    "bs58": "^6.0.0",
     "buffer": "^6.0.3",
     "next": "16.1.1",
     "react": "19.2.3",

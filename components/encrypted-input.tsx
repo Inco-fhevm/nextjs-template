@@ -1,33 +1,27 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import { useWallet, useConnection } from "@solana/wallet-adapter-react";
+import { useState, useEffect, useRef } from "react";
+import {
+  useWallet,
+  useConnection,
+  useAnchorWallet,
+} from "@solana/wallet-adapter-react";
 import { encryptValue } from "@inco/solana-sdk/encryption";
-import {
-  PublicKey,
-  Transaction,
-  TransactionInstruction,
-  SystemProgram,
-  Keypair,
-} from "@solana/web3.js";
+import { Keypair, Transaction } from "@solana/web3.js";
 import { Buffer } from "buffer";
-import {
-  INCO_BASE_PROGRAM_ID,
-  PROGRAM_ID,
-  INITIALIZE_MINT_DISCRIMINATOR,
-  INITIALIZE_ACCOUNT_DISCRIMINATOR,
-  MINT_TO_DISCRIMINATOR,
-  fetchUserMint,
-  fetchUserTokenAccount,
-} from "@/utils/constants";
+import { fetchUserMint, fetchUserTokenAccount } from "@/utils/constants";
+import { getProgram } from "@/utils/program";
 
 const EncryptedInput = () => {
-  const { publicKey, signTransaction, connected } = useWallet();
+  const { publicKey, connected, sendTransaction } = useWallet();
   const { connection } = useConnection();
+  const wallet = useAnchorWallet();
+  const lastFetchedWallet = useRef<string | null>(null);
 
-  const [mintAddress, setMintAddress] = useState<PublicKey | null>(null);
-  const [tokenAccountAddress, setTokenAccountAddress] =
-    useState<PublicKey | null>(null);
+  const [mintAddress, setMintAddress] = useState<string | null>(null);
+  const [tokenAccountAddress, setTokenAccountAddress] = useState<string | null>(
+    null
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [value, setValue] = useState("");
   const [encryptedValue, setEncryptedValue] = useState("");
@@ -36,8 +30,7 @@ const EncryptedInput = () => {
   const [isMinting, setIsMinting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch user's existing mint and token account
-  const fetchAccounts = useCallback(async () => {
+  const fetchAccounts = async () => {
     if (!connected || !publicKey) {
       setMintAddress(null);
       setTokenAccountAddress(null);
@@ -46,17 +39,15 @@ const EncryptedInput = () => {
 
     setIsLoading(true);
     try {
-      // Find user's mint
       const mint = await fetchUserMint(connection, publicKey);
       if (mint) {
-        setMintAddress(mint.pubkey);
-        // Find token account for this mint
+        setMintAddress(mint.pubkey.toBase58());
         const tokenAccount = await fetchUserTokenAccount(
           connection,
           publicKey,
           mint.pubkey
         );
-        setTokenAccountAddress(tokenAccount?.pubkey ?? null);
+        setTokenAccountAddress(tokenAccount?.pubkey.toBase58() ?? null);
       } else {
         setMintAddress(null);
         setTokenAccountAddress(null);
@@ -66,11 +57,20 @@ const EncryptedInput = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [connected, publicKey, connection]);
+  };
 
   useEffect(() => {
-    fetchAccounts();
-  }, [fetchAccounts]);
+    const walletKey = publicKey?.toBase58() ?? null;
+    if (walletKey !== lastFetchedWallet.current) {
+      lastFetchedWallet.current = walletKey;
+      if (walletKey) fetchAccounts();
+      else {
+        setMintAddress(null);
+        setTokenAccountAddress(null);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [publicKey]);
 
   const handleEncrypt = async () => {
     if (!value) return;
@@ -86,7 +86,7 @@ const EncryptedInput = () => {
   };
 
   const handleMint = async () => {
-    if (!connected || !publicKey || !signTransaction || !encryptedValue) {
+    if (!connected || !publicKey || !wallet || !encryptedValue) {
       return setError("Missing required data");
     }
 
@@ -94,129 +94,74 @@ const EncryptedInput = () => {
     setError(null);
 
     try {
+      const program = getProgram(connection, wallet);
+      const ciphertext = Buffer.from(encryptedValue.replace("0x", ""), "hex");
+      const signers: Keypair[] = [];
       const tx = new Transaction();
+
       let currentMint = mintAddress;
       let currentTokenAccount = tokenAccountAddress;
-      let mintKp: Keypair | null = null;
-      let tokenAccountKp: Keypair | null = null;
 
-      // If no mint exists, create one
+      // Create mint if needed
       if (!currentMint) {
-        mintKp = Keypair.generate();
-        currentMint = mintKp.publicKey;
-
-        const initMintData = Buffer.concat([
-          Buffer.from(INITIALIZE_MINT_DISCRIMINATOR),
-          Buffer.from([9]), // decimals
-          publicKey.toBuffer(), // mint_authority
-          Buffer.from([1]), // Some(freeze_authority)
-          publicKey.toBuffer(), // freeze_authority
-        ]);
-
-        tx.add(
-          new TransactionInstruction({
-            keys: [
-              { pubkey: mintKp.publicKey, isSigner: true, isWritable: true },
-              { pubkey: publicKey, isSigner: true, isWritable: true },
-              {
-                pubkey: SystemProgram.programId,
-                isSigner: false,
-                isWritable: false,
-              },
-              {
-                pubkey: INCO_BASE_PROGRAM_ID,
-                isSigner: false,
-                isWritable: false,
-              },
-            ],
-            programId: PROGRAM_ID,
-            data: initMintData,
-          })
-        );
+        const mintKp = Keypair.generate();
+        const initMintIx = await program.methods
+          .initializeMint(9, publicKey, publicKey)
+          .accounts({ mint: mintKp.publicKey, payer: publicKey })
+          .instruction();
+        tx.add(initMintIx);
+        signers.push(mintKp);
+        currentMint = mintKp.publicKey.toBase58();
       }
 
-      // If no token account exists, create one
+      // Create token account if needed
       if (!currentTokenAccount) {
-        tokenAccountKp = Keypair.generate();
-        currentTokenAccount = tokenAccountKp.publicKey;
-
-        tx.add(
-          new TransactionInstruction({
-            keys: [
-              {
-                pubkey: tokenAccountKp.publicKey,
-                isSigner: true,
-                isWritable: true,
-              },
-              { pubkey: currentMint, isSigner: false, isWritable: false },
-              { pubkey: publicKey, isSigner: false, isWritable: false },
-              { pubkey: publicKey, isSigner: true, isWritable: true },
-              {
-                pubkey: SystemProgram.programId,
-                isSigner: false,
-                isWritable: false,
-              },
-              {
-                pubkey: INCO_BASE_PROGRAM_ID,
-                isSigner: false,
-                isWritable: false,
-              },
-            ],
-            programId: PROGRAM_ID,
-            data: Buffer.from(INITIALIZE_ACCOUNT_DISCRIMINATOR),
+        const accountKp = Keypair.generate();
+        const initAccountIx = await program.methods
+          .initializeAccount()
+          .accounts({
+            account: accountKp.publicKey,
+            mint: currentMint,
+            owner: publicKey,
+            payer: publicKey,
           })
-        );
+          .instruction();
+        tx.add(initAccountIx);
+        signers.push(accountKp);
+        currentTokenAccount = accountKp.publicKey.toBase58();
       }
 
       // Mint tokens
-      const ciphertext = Buffer.from(encryptedValue.replace("0x", ""), "hex");
-      const mintData = Buffer.concat([
-        Buffer.from(MINT_TO_DISCRIMINATOR),
-        Buffer.from(new Uint32Array([ciphertext.length]).buffer),
-        ciphertext,
-        Buffer.from([0]),
-      ]);
-
-      tx.add(
-        new TransactionInstruction({
-          keys: [
-            { pubkey: currentMint, isSigner: false, isWritable: true },
-            { pubkey: currentTokenAccount, isSigner: false, isWritable: true },
-            { pubkey: publicKey, isSigner: true, isWritable: true },
-            {
-              pubkey: INCO_BASE_PROGRAM_ID,
-              isSigner: false,
-              isWritable: false,
-            },
-          ],
-          programId: PROGRAM_ID,
-          data: mintData,
+      const mintIx = await program.methods
+        .mintTo(ciphertext, 0)
+        .accounts({
+          mint: currentMint,
+          account: currentTokenAccount,
+          mintAuthority: publicKey,
         })
-      );
+        .instruction();
+      tx.add(mintIx);
 
+      // Send single transaction
       const { blockhash } = await connection.getLatestBlockhash("confirmed");
       tx.recentBlockhash = blockhash;
       tx.feePayer = publicKey;
 
-      // Sign with new keypairs if created
-      const signers = [mintKp, tokenAccountKp].filter(Boolean) as Keypair[];
-      if (signers.length > 0) tx.partialSign(...signers);
+      if (signers.length > 0) {
+        tx.partialSign(...signers);
+      }
 
-      const signed = await signTransaction(tx);
-      const sig = await connection.sendRawTransaction(signed.serialize(), {
-        skipPreflight: false,
-        preflightCommitment: "confirmed",
-      });
+      const sig = await sendTransaction(tx, connection);
       await connection.confirmTransaction(sig, "confirmed");
 
+      setMintAddress(currentMint);
+      setTokenAccountAddress(currentTokenAccount);
       setTxHash(sig);
       setValue("");
       setEncryptedValue("");
-
-      // Refresh accounts
-      await fetchAccounts();
       window.dispatchEvent(new CustomEvent("token-minted"));
     } catch (err) {
+      console.error(err);
       setError(err instanceof Error ? err.message : "Failed to mint");
     } finally {
       setIsMinting(false);
@@ -247,7 +192,7 @@ const EncryptedInput = () => {
                 mintAddress ? "text-green-600" : "text-yellow-600"
               }`}
             >
-              {mintAddress ? truncate(mintAddress.toBase58()) : "Not created"}
+              {mintAddress ? truncate(mintAddress) : "Not created"}
             </span>
           </div>
           <div className="flex justify-between">
@@ -258,12 +203,13 @@ const EncryptedInput = () => {
               }`}
             >
               {tokenAccountAddress
-                ? truncate(tokenAccountAddress.toBase58())
+                ? truncate(tokenAccountAddress)
                 : "Not created"}
             </span>
           </div>
           <button
             onClick={fetchAccounts}
+            disabled={isLoading}
             className="text-blue-500 text-xs underline"
           >
             Refresh

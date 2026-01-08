@@ -1,11 +1,10 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useWallet, useConnection } from "@solana/wallet-adapter-react";
 import { decrypt } from "@inco/solana-sdk/attested-decrypt";
 import { fetchUserMint, fetchUserTokenAccount } from "@/utils/constants";
 
-// Convert 16 bytes (little-endian) to u128 BigInt
 const bytesToU128LE = (bytes: Uint8Array): bigint => {
   let result = BigInt(0);
   for (let i = 15; i >= 0; i--)
@@ -19,8 +18,9 @@ const Balance = () => {
   const [balance, setBalance] = useState<string>();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const hasFetched = useRef(false);
 
-  const handleReadBalance = useCallback(async () => {
+  const handleReadBalance = async () => {
     if (!connected || !publicKey) {
       setBalance(undefined);
       return;
@@ -30,25 +30,22 @@ const Balance = () => {
     setError(null);
 
     try {
-      // Fetch user's mint
       const mint = await fetchUserMint(connection, publicKey);
       if (!mint) {
-        setBalance("No mint found");
+        setBalance("No mint");
         return;
       }
 
-      // Fetch token account for that mint
       const tokenAccount = await fetchUserTokenAccount(
         connection,
         publicKey,
         mint.pubkey
       );
       if (!tokenAccount) {
-        setBalance("No token account");
+        setBalance("No account");
         return;
       }
 
-      // IncoAccount: discriminator(8) + mint(32) + owner(32) + amount(16)
       const handleBytes = tokenAccount.data.slice(72, 88);
       if (handleBytes.every((b) => b === 0)) {
         setBalance("0");
@@ -63,25 +60,28 @@ const Balance = () => {
 
       setBalance(result.plaintexts?.[0] ?? "0");
     } catch (err) {
-      console.error("Decrypt error:", err);
-      setError(err instanceof Error ? err.message : "Failed to decrypt");
+      console.error("Balance error:", err);
+      setError(err instanceof Error ? err.message : "Failed");
       setBalance("0");
     } finally {
       setIsLoading(false);
     }
-  }, [connected, publicKey, connection]);
+  };
 
+  // Reset on wallet change
   useEffect(() => {
-    if (connected && publicKey) {
-      handleReadBalance();
-    } else {
-      setBalance(undefined);
-    }
+    hasFetched.current = false;
+    setBalance(undefined);
+    setError(null);
+  }, [publicKey]);
 
-    const handleMint = () => setTimeout(handleReadBalance, 2000); // Wait for chain
-    window.addEventListener("token-minted", handleMint);
-    return () => window.removeEventListener("token-minted", handleMint);
-  }, [connected, publicKey, handleReadBalance]);
+  // Listen for mint events - fetch after delay
+  useEffect(() => {
+    const onMint = () => setTimeout(handleReadBalance, 3000);
+    window.addEventListener("token-minted", onMint);
+    return () => window.removeEventListener("token-minted", onMint);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [connected, publicKey]);
 
   return (
     <div className="mt-8 space-y-4">
@@ -97,7 +97,7 @@ const Balance = () => {
           disabled={isLoading || !connected}
           className="bg-gray-600 text-white py-2 px-4 rounded-full hover:bg-gray-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
         >
-          {isLoading ? "Decrypting..." : "Refresh"}
+          {isLoading ? "Loading..." : "Refresh"}
         </button>
       </div>
       {error && <p className="text-sm text-red-500">{error}</p>}
