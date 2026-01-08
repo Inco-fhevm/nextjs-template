@@ -1,15 +1,11 @@
 import { PublicKey, Connection } from "@solana/web3.js";
 import bs58 from "bs58";
+import idl from "./idl.json";
 
-export const PROGRAM_ID = new PublicKey(
-  "7PkBc98v6bKkX8oc8Wmce6HNR5BiEt1YcRFB4DLsrPW8"
-);
-
-// Discriminators from IDL (for getProgramAccounts filters)
+export const PROGRAM_ID = new PublicKey(idl.address);
 export const INCO_MINT_DISCRIMINATOR = [254, 129, 245, 169, 202, 143, 198, 4];
 export const INCO_ACCOUNT_DISCRIMINATOR = [18, 233, 131, 18, 230, 173, 249, 89];
 
-// Fetch user's IncoMint (where they are mint_authority)
 export const fetchUserMint = async (
   connection: Connection,
   wallet: PublicKey
@@ -30,7 +26,6 @@ export const fetchUserMint = async (
     : null;
 };
 
-// Fetch user's IncoAccount for a specific mint
 export const fetchUserTokenAccount = async (
   connection: Connection,
   wallet: PublicKey,

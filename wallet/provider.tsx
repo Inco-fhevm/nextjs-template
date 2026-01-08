@@ -33,7 +33,6 @@ const WalletConnectionWrapper = dynamic(
 );
 
 export const Wallet = ({ children }: { children: React.ReactNode }) => {
-  // Use testnet explicitly
   const endpoint =
     process.env.NEXT_PUBLIC_SOLANA_RPC_URL || clusterApiUrl("devnet");
 

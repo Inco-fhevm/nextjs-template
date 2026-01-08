@@ -68,14 +68,12 @@ const Balance = () => {
     }
   };
 
-  // Reset on wallet change
   useEffect(() => {
     hasFetched.current = false;
     setBalance(undefined);
     setError(null);
   }, [publicKey]);
 
-  // Listen for mint events - fetch after delay
   useEffect(() => {
     const onMint = () => setTimeout(handleReadBalance, 3000);
     window.addEventListener("token-minted", onMint);
