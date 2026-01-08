@@ -1,0 +1,2315 @@
+{
+    "address": "7PkBc98v6bKkX8oc8Wmce6HNR5BiEt1YcRFB4DLsrPW8",
+    "metadata": {
+      "name": "inco_token",
+      "version": "0.1.0",
+      "spec": "0.1.0",
+      "description": "Lightning Rod - Encrypted Token Program for Solana using Inco Lightning"
+    },
+    "instructions": [
+      {
+        "name": "approve",
+        "discriminator": [
+          69,
+          74,
+          217,
+          36,
+          115,
+          117,
+          97,
+          76
+        ],
+        "accounts": [
+          {
+            "name": "source",
+            "writable": true
+          },
+          {
+            "name": "delegate"
+          },
+          {
+            "name": "owner",
+            "writable": true,
+            "signer": true
+          },
+          {
+            "name": "inco_lightning_program",
+            "address": "5sjEbPiqgZrYwR31ahR6Uk9wf5awoX61YGg7jExQSwaj"
+          }
+        ],
+        "args": [
+          {
+            "name": "ciphertext",
+            "type": "bytes"
+          },
+          {
+            "name": "input_type",
+            "type": "u8"
+          }
+        ]
+      },
+      {
+        "name": "approve_checked",
+        "discriminator": [
+          47,
+          197,
+          254,
+          42,
+          58,
+          201,
+          58,
+          109
+        ],
+        "accounts": [
+          {
+            "name": "source",
+            "writable": true
+          },
+          {
+            "name": "mint"
+          },
+          {
+            "name": "delegate"
+          },
+          {
+            "name": "owner",
+            "writable": true,
+            "signer": true
+          },
+          {
+            "name": "inco_lightning_program",
+            "address": "5sjEbPiqgZrYwR31ahR6Uk9wf5awoX61YGg7jExQSwaj"
+          }
+        ],
+        "args": [
+          {
+            "name": "ciphertext",
+            "type": "bytes"
+          },
+          {
+            "name": "input_type",
+            "type": "u8"
+          },
+          {
+            "name": "decimals",
+            "type": "u8"
+          }
+        ]
+      },
+      {
+        "name": "build_memo",
+        "discriminator": [
+          1,
+          77,
+          10,
+          59,
+          60,
+          3,
+          84,
+          73
+        ],
+        "accounts": [
+          {
+            "name": "authority",
+            "signer": true
+          },
+          {
+            "name": "inco_lightning_program",
+            "address": "5sjEbPiqgZrYwR31ahR6Uk9wf5awoX61YGg7jExQSwaj"
+          }
+        ],
+        "args": [
+          {
+            "name": "encrypted_memo",
+            "type": "bytes"
+          },
+          {
+            "name": "input_type",
+            "type": "u8"
+          }
+        ]
+      },
+      {
+        "name": "burn",
+        "discriminator": [
+          116,
+          110,
+          29,
+          56,
+          107,
+          219,
+          42,
+          93
+        ],
+        "accounts": [
+          {
+            "name": "account",
+            "writable": true
+          },
+          {
+            "name": "mint",
+            "writable": true
+          },
+          {
+            "name": "authority",
+            "writable": true,
+            "signer": true
+          },
+          {
+            "name": "inco_lightning_program",
+            "address": "5sjEbPiqgZrYwR31ahR6Uk9wf5awoX61YGg7jExQSwaj"
+          }
+        ],
+        "args": [
+          {
+            "name": "ciphertext",
+            "type": "bytes"
+          },
+          {
+            "name": "input_type",
+            "type": "u8"
+          }
+        ]
+      },
+      {
+        "name": "burn_checked",
+        "discriminator": [
+          198,
+          121,
+          200,
+          102,
+          120,
+          208,
+          155,
+          178
+        ],
+        "accounts": [
+          {
+            "name": "account",
+            "writable": true
+          },
+          {
+            "name": "mint",
+            "writable": true
+          },
+          {
+            "name": "authority",
+            "writable": true,
+            "signer": true
+          },
+          {
+            "name": "inco_lightning_program",
+            "address": "5sjEbPiqgZrYwR31ahR6Uk9wf5awoX61YGg7jExQSwaj"
+          }
+        ],
+        "args": [
+          {
+            "name": "ciphertext",
+            "type": "bytes"
+          },
+          {
+            "name": "input_type",
+            "type": "u8"
+          },
+          {
+            "name": "decimals",
+            "type": "u8"
+          }
+        ]
+      },
+      {
+        "name": "close_account",
+        "discriminator": [
+          125,
+          255,
+          149,
+          14,
+          110,
+          34,
+          72,
+          24
+        ],
+        "accounts": [
+          {
+            "name": "account",
+            "writable": true
+          },
+          {
+            "name": "destination",
+            "writable": true
+          },
+          {
+            "name": "authority",
+            "writable": true,
+            "signer": true
+          }
+        ],
+        "args": []
+      },
+      {
+        "name": "close_account_2022",
+        "discriminator": [
+          181,
+          66,
+          187,
+          4,
+          165,
+          230,
+          192,
+          161
+        ],
+        "accounts": [
+          {
+            "name": "account",
+            "writable": true
+          },
+          {
+            "name": "destination",
+            "writable": true
+          },
+          {
+            "name": "authority",
+            "writable": true,
+            "signer": true
+          }
+        ],
+        "args": []
+      },
+      {
+        "name": "create",
+        "discriminator": [
+          24,
+          30,
+          200,
+          40,
+          5,
+          28,
+          7,
+          119
+        ],
+        "accounts": [
+          {
+            "name": "payer",
+            "writable": true,
+            "signer": true
+          },
+          {
+            "name": "associated_token",
+            "writable": true,
+            "pda": {
+              "seeds": [
+                {
+                  "kind": "account",
+                  "path": "wallet"
+                },
+                {
+                  "kind": "const",
+                  "value": [
+                    94,
+                    249,
+                    185,
+                    243,
+                    148,
+                    81,
+                    47,
+                    37,
+                    216,
+                    207,
+                    184,
+                    115,
+                    86,
+                    49,
+                    55,
+                    169,
+                    14,
+                    132,
+                    65,
+                    156,
+                    10,
+                    152,
+                    140,
+                    85,
+                    96,
+                    196,
+                    170,
+                    58,
+                    202,
+                    243,
+                    153,
+                    217
+                  ]
+                },
+                {
+                  "kind": "account",
+                  "path": "mint"
+                }
+              ]
+            }
+          },
+          {
+            "name": "wallet"
+          },
+          {
+            "name": "mint"
+          },
+          {
+            "name": "system_program",
+            "address": "11111111111111111111111111111111"
+          },
+          {
+            "name": "inco_lightning_program",
+            "address": "5sjEbPiqgZrYwR31ahR6Uk9wf5awoX61YGg7jExQSwaj"
+          }
+        ],
+        "args": []
+      },
+      {
+        "name": "create_idempotent",
+        "discriminator": [
+          143,
+          88,
+          34,
+          91,
+          112,
+          20,
+          245,
+          59
+        ],
+        "accounts": [
+          {
+            "name": "payer",
+            "writable": true,
+            "signer": true
+          },
+          {
+            "name": "associated_token",
+            "writable": true,
+            "pda": {
+              "seeds": [
+                {
+                  "kind": "account",
+                  "path": "wallet"
+                },
+                {
+                  "kind": "const",
+                  "value": [
+                    94,
+                    249,
+                    185,
+                    243,
+                    148,
+                    81,
+                    47,
+                    37,
+                    216,
+                    207,
+                    184,
+                    115,
+                    86,
+                    49,
+                    55,
+                    169,
+                    14,
+                    132,
+                    65,
+                    156,
+                    10,
+                    152,
+                    140,
+                    85,
+                    96,
+                    196,
+                    170,
+                    58,
+                    202,
+                    243,
+                    153,
+                    217
+                  ]
+                },
+                {
+                  "kind": "account",
+                  "path": "mint"
+                }
+              ]
+            }
+          },
+          {
+            "name": "wallet"
+          },
+          {
+            "name": "mint"
+          },
+          {
+            "name": "system_program",
+            "address": "11111111111111111111111111111111"
+          },
+          {
+            "name": "inco_lightning_program",
+            "address": "5sjEbPiqgZrYwR31ahR6Uk9wf5awoX61YGg7jExQSwaj"
+          }
+        ],
+        "args": []
+      },
+      {
+        "name": "create_master_edition",
+        "discriminator": [
+          179,
+          210,
+          96,
+          96,
+          57,
+          25,
+          79,
+          69
+        ],
+        "accounts": [
+          {
+            "name": "edition",
+            "writable": true,
+            "signer": true
+          },
+          {
+            "name": "metadata"
+          },
+          {
+            "name": "mint"
+          },
+          {
+            "name": "mint_authority",
+            "writable": true,
+            "signer": true
+          },
+          {
+            "name": "payer",
+            "writable": true,
+            "signer": true
+          },
+          {
+            "name": "update_authority"
+          },
+          {
+            "name": "system_program",
+            "address": "11111111111111111111111111111111"
+          }
+        ],
+        "args": [
+          {
+            "name": "args",
+            "type": {
+              "defined": {
+                "name": "CreateMasterEditionArgs"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "create_metadata_account",
+        "discriminator": [
+          75,
+          73,
+          45,
+          178,
+          212,
+          194,
+          127,
+          113
+        ],
+        "accounts": [
+          {
+            "name": "metadata",
+            "writable": true,
+            "signer": true
+          },
+          {
+            "name": "mint"
+          },
+          {
+            "name": "mint_authority",
+            "writable": true,
+            "signer": true
+          },
+          {
+            "name": "payer",
+            "writable": true,
+            "signer": true
+          },
+          {
+            "name": "update_authority"
+          },
+          {
+            "name": "system_program",
+            "address": "11111111111111111111111111111111"
+          }
+        ],
+        "args": [
+          {
+            "name": "args",
+            "type": {
+              "defined": {
+                "name": "CreateMetadataArgs"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "freeze_account",
+        "discriminator": [
+          253,
+          75,
+          82,
+          133,
+          167,
+          238,
+          43,
+          130
+        ],
+        "accounts": [
+          {
+            "name": "account",
+            "writable": true
+          },
+          {
+            "name": "mint"
+          },
+          {
+            "name": "freeze_authority",
+            "writable": true,
+            "signer": true
+          }
+        ],
+        "args": []
+      },
+      {
+        "name": "initialize_account",
+        "discriminator": [
+          74,
+          115,
+          99,
+          93,
+          197,
+          69,
+          103,
+          7
+        ],
+        "accounts": [
+          {
+            "name": "account",
+            "writable": true,
+            "signer": true
+          },
+          {
+            "name": "mint"
+          },
+          {
+            "name": "owner"
+          },
+          {
+            "name": "payer",
+            "writable": true,
+            "signer": true
+          },
+          {
+            "name": "system_program",
+            "address": "11111111111111111111111111111111"
+          },
+          {
+            "name": "inco_lightning_program",
+            "address": "5sjEbPiqgZrYwR31ahR6Uk9wf5awoX61YGg7jExQSwaj"
+          }
+        ],
+        "args": []
+      },
+      {
+        "name": "initialize_account3",
+        "discriminator": [
+          23,
+          142,
+          140,
+          135,
+          21,
+          160,
+          133,
+          64
+        ],
+        "accounts": [
+          {
+            "name": "account",
+            "writable": true,
+            "signer": true
+          },
+          {
+            "name": "mint"
+          },
+          {
+            "name": "authority",
+            "writable": true,
+            "signer": true
+          },
+          {
+            "name": "system_program",
+            "address": "11111111111111111111111111111111"
+          },
+          {
+            "name": "inco_lightning_program",
+            "address": "5sjEbPiqgZrYwR31ahR6Uk9wf5awoX61YGg7jExQSwaj"
+          }
+        ],
+        "args": []
+      },
+      {
+        "name": "initialize_mint",
+        "discriminator": [
+          209,
+          42,
+          195,
+          4,
+          129,
+          85,
+          209,
+          44
+        ],
+        "accounts": [
+          {
+            "name": "mint",
+            "writable": true,
+            "signer": true
+          },
+          {
+            "name": "payer",
+            "writable": true,
+            "signer": true
+          },
+          {
+            "name": "system_program",
+            "address": "11111111111111111111111111111111"
+          },
+          {
+            "name": "inco_lightning_program",
+            "address": "5sjEbPiqgZrYwR31ahR6Uk9wf5awoX61YGg7jExQSwaj"
+          }
+        ],
+        "args": [
+          {
+            "name": "decimals",
+            "type": "u8"
+          },
+          {
+            "name": "mint_authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "freeze_authority",
+            "type": {
+              "option": "pubkey"
+            }
+          }
+        ]
+      },
+      {
+        "name": "mint_to",
+        "discriminator": [
+          241,
+          34,
+          48,
+          186,
+          37,
+          179,
+          123,
+          192
+        ],
+        "accounts": [
+          {
+            "name": "mint",
+            "writable": true
+          },
+          {
+            "name": "account",
+            "writable": true
+          },
+          {
+            "name": "mint_authority",
+            "writable": true,
+            "signer": true
+          },
+          {
+            "name": "inco_lightning_program",
+            "address": "5sjEbPiqgZrYwR31ahR6Uk9wf5awoX61YGg7jExQSwaj"
+          }
+        ],
+        "args": [
+          {
+            "name": "ciphertext",
+            "type": "bytes"
+          },
+          {
+            "name": "input_type",
+            "type": "u8"
+          }
+        ]
+      },
+      {
+        "name": "mint_to_checked",
+        "discriminator": [
+          229,
+          236,
+          36,
+          240,
+          118,
+          225,
+          45,
+          125
+        ],
+        "accounts": [
+          {
+            "name": "mint",
+            "writable": true
+          },
+          {
+            "name": "account",
+            "writable": true
+          },
+          {
+            "name": "authority",
+            "writable": true,
+            "signer": true
+          },
+          {
+            "name": "inco_lightning_program",
+            "address": "5sjEbPiqgZrYwR31ahR6Uk9wf5awoX61YGg7jExQSwaj"
+          }
+        ],
+        "args": [
+          {
+            "name": "ciphertext",
+            "type": "bytes"
+          },
+          {
+            "name": "input_type",
+            "type": "u8"
+          },
+          {
+            "name": "decimals",
+            "type": "u8"
+          }
+        ]
+      },
+      {
+        "name": "mint_to_with_handle",
+        "discriminator": [
+          212,
+          0,
+          185,
+          69,
+          107,
+          145,
+          108,
+          149
+        ],
+        "accounts": [
+          {
+            "name": "mint",
+            "writable": true
+          },
+          {
+            "name": "account",
+            "writable": true
+          },
+          {
+            "name": "mint_authority",
+            "writable": true,
+            "signer": true
+          },
+          {
+            "name": "inco_lightning_program",
+            "address": "5sjEbPiqgZrYwR31ahR6Uk9wf5awoX61YGg7jExQSwaj"
+          }
+        ],
+        "args": [
+          {
+            "name": "amount_handle",
+            "type": {
+              "defined": {
+                "name": "Euint128"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "print_edition",
+        "discriminator": [
+          182,
+          213,
+          76,
+          48,
+          196,
+          144,
+          223,
+          103
+        ],
+        "accounts": [
+          {
+            "name": "edition",
+            "writable": true,
+            "signer": true
+          },
+          {
+            "name": "master_edition",
+            "writable": true
+          },
+          {
+            "name": "payer",
+            "writable": true,
+            "signer": true
+          },
+          {
+            "name": "system_program",
+            "address": "11111111111111111111111111111111"
+          }
+        ],
+        "args": [
+          {
+            "name": "args",
+            "type": {
+              "defined": {
+                "name": "PrintEditionArgs"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "remove_creator_verification",
+        "discriminator": [
+          41,
+          194,
+          140,
+          217,
+          90,
+          160,
+          139,
+          6
+        ],
+        "accounts": [
+          {
+            "name": "metadata",
+            "writable": true
+          },
+          {
+            "name": "creator",
+            "signer": true
+          }
+        ],
+        "args": []
+      },
+      {
+        "name": "revoke",
+        "discriminator": [
+          170,
+          23,
+          31,
+          34,
+          133,
+          173,
+          93,
+          242
+        ],
+        "accounts": [
+          {
+            "name": "source",
+            "writable": true
+          },
+          {
+            "name": "owner",
+            "writable": true,
+            "signer": true
+          },
+          {
+            "name": "inco_lightning_program",
+            "address": "5sjEbPiqgZrYwR31ahR6Uk9wf5awoX61YGg7jExQSwaj"
+          }
+        ],
+        "args": []
+      },
+      {
+        "name": "revoke_2022",
+        "discriminator": [
+          239,
+          4,
+          176,
+          163,
+          116,
+          155,
+          31,
+          7
+        ],
+        "accounts": [
+          {
+            "name": "source",
+            "writable": true
+          },
+          {
+            "name": "authority",
+            "writable": true,
+            "signer": true
+          },
+          {
+            "name": "inco_lightning_program",
+            "address": "5sjEbPiqgZrYwR31ahR6Uk9wf5awoX61YGg7jExQSwaj"
+          }
+        ],
+        "args": []
+      },
+      {
+        "name": "set_account_owner",
+        "discriminator": [
+          188,
+          192,
+          15,
+          103,
+          89,
+          135,
+          159,
+          89
+        ],
+        "accounts": [
+          {
+            "name": "account",
+            "writable": true
+          },
+          {
+            "name": "current_owner",
+            "writable": true,
+            "signer": true
+          }
+        ],
+        "args": [
+          {
+            "name": "new_owner",
+            "type": "pubkey"
+          }
+        ]
+      },
+      {
+        "name": "set_and_verify_collection",
+        "discriminator": [
+          235,
+          242,
+          121,
+          216,
+          158,
+          234,
+          180,
+          234
+        ],
+        "accounts": [
+          {
+            "name": "metadata",
+            "writable": true
+          },
+          {
+            "name": "update_authority",
+            "signer": true
+          }
+        ],
+        "args": [
+          {
+            "name": "collection",
+            "type": {
+              "defined": {
+                "name": "Collection"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "set_close_authority",
+        "discriminator": [
+          144,
+          183,
+          224,
+          104,
+          83,
+          213,
+          219,
+          172
+        ],
+        "accounts": [
+          {
+            "name": "account",
+            "writable": true
+          },
+          {
+            "name": "owner",
+            "writable": true,
+            "signer": true
+          }
+        ],
+        "args": [
+          {
+            "name": "new_authority",
+            "type": {
+              "option": "pubkey"
+            }
+          }
+        ]
+      },
+      {
+        "name": "set_freeze_authority",
+        "discriminator": [
+          159,
+          131,
+          149,
+          192,
+          109,
+          186,
+          68,
+          227
+        ],
+        "accounts": [
+          {
+            "name": "mint",
+            "writable": true
+          },
+          {
+            "name": "current_authority",
+            "writable": true,
+            "signer": true
+          }
+        ],
+        "args": [
+          {
+            "name": "new_authority",
+            "type": {
+              "option": "pubkey"
+            }
+          }
+        ]
+      },
+      {
+        "name": "set_mint_authority",
+        "discriminator": [
+          67,
+          127,
+          155,
+          187,
+          100,
+          174,
+          103,
+          121
+        ],
+        "accounts": [
+          {
+            "name": "mint",
+            "writable": true
+          },
+          {
+            "name": "current_authority",
+            "writable": true,
+            "signer": true
+          }
+        ],
+        "args": [
+          {
+            "name": "new_authority",
+            "type": {
+              "option": "pubkey"
+            }
+          }
+        ]
+      },
+      {
+        "name": "sign_metadata",
+        "discriminator": [
+          178,
+          245,
+          253,
+          205,
+          236,
+          250,
+          233,
+          209
+        ],
+        "accounts": [
+          {
+            "name": "metadata",
+            "writable": true
+          },
+          {
+            "name": "creator",
+            "signer": true
+          }
+        ],
+        "args": []
+      },
+      {
+        "name": "thaw_account",
+        "discriminator": [
+          115,
+          152,
+          79,
+          213,
+          213,
+          169,
+          184,
+          35
+        ],
+        "accounts": [
+          {
+            "name": "account",
+            "writable": true
+          },
+          {
+            "name": "mint"
+          },
+          {
+            "name": "freeze_authority",
+            "writable": true,
+            "signer": true
+          }
+        ],
+        "args": []
+      },
+      {
+        "name": "transfer",
+        "discriminator": [
+          163,
+          52,
+          200,
+          231,
+          140,
+          3,
+          69,
+          186
+        ],
+        "accounts": [
+          {
+            "name": "source",
+            "writable": true
+          },
+          {
+            "name": "destination",
+            "writable": true
+          },
+          {
+            "name": "authority",
+            "writable": true,
+            "signer": true
+          },
+          {
+            "name": "inco_lightning_program",
+            "address": "5sjEbPiqgZrYwR31ahR6Uk9wf5awoX61YGg7jExQSwaj"
+          }
+        ],
+        "args": [
+          {
+            "name": "ciphertext",
+            "type": "bytes"
+          },
+          {
+            "name": "input_type",
+            "type": "u8"
+          }
+        ]
+      },
+      {
+        "name": "transfer_checked",
+        "discriminator": [
+          119,
+          250,
+          202,
+          24,
+          253,
+          135,
+          244,
+          121
+        ],
+        "accounts": [
+          {
+            "name": "source",
+            "writable": true
+          },
+          {
+            "name": "mint"
+          },
+          {
+            "name": "destination",
+            "writable": true
+          },
+          {
+            "name": "authority",
+            "writable": true,
+            "signer": true
+          },
+          {
+            "name": "inco_lightning_program",
+            "address": "5sjEbPiqgZrYwR31ahR6Uk9wf5awoX61YGg7jExQSwaj"
+          }
+        ],
+        "args": [
+          {
+            "name": "ciphertext",
+            "type": "bytes"
+          },
+          {
+            "name": "input_type",
+            "type": "u8"
+          },
+          {
+            "name": "decimals",
+            "type": "u8"
+          }
+        ]
+      },
+      {
+        "name": "transfer_checked_with_handle",
+        "discriminator": [
+          85,
+          140,
+          71,
+          159,
+          98,
+          189,
+          215,
+          74
+        ],
+        "accounts": [
+          {
+            "name": "source",
+            "writable": true
+          },
+          {
+            "name": "mint"
+          },
+          {
+            "name": "destination",
+            "writable": true
+          },
+          {
+            "name": "authority",
+            "writable": true,
+            "signer": true
+          },
+          {
+            "name": "inco_lightning_program",
+            "address": "5sjEbPiqgZrYwR31ahR6Uk9wf5awoX61YGg7jExQSwaj"
+          }
+        ],
+        "args": [
+          {
+            "name": "amount_handle",
+            "type": {
+              "defined": {
+                "name": "Euint128"
+              }
+            }
+          },
+          {
+            "name": "decimals",
+            "type": "u8"
+          }
+        ]
+      },
+      {
+        "name": "transfer_with_handle",
+        "discriminator": [
+          93,
+          55,
+          30,
+          205,
+          8,
+          14,
+          246,
+          126
+        ],
+        "accounts": [
+          {
+            "name": "source",
+            "writable": true
+          },
+          {
+            "name": "destination",
+            "writable": true
+          },
+          {
+            "name": "authority",
+            "writable": true,
+            "signer": true
+          },
+          {
+            "name": "inco_lightning_program",
+            "address": "5sjEbPiqgZrYwR31ahR6Uk9wf5awoX61YGg7jExQSwaj"
+          }
+        ],
+        "args": [
+          {
+            "name": "amount_handle",
+            "type": {
+              "defined": {
+                "name": "Euint128"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "unverify_collection",
+        "discriminator": [
+          250,
+          251,
+          42,
+          106,
+          41,
+          137,
+          186,
+          168
+        ],
+        "accounts": [
+          {
+            "name": "metadata",
+            "writable": true
+          },
+          {
+            "name": "collection_authority",
+            "signer": true
+          }
+        ],
+        "args": []
+      },
+      {
+        "name": "update_metadata_account",
+        "discriminator": [
+          141,
+          14,
+          23,
+          104,
+          247,
+          192,
+          53,
+          173
+        ],
+        "accounts": [
+          {
+            "name": "metadata",
+            "writable": true
+          },
+          {
+            "name": "update_authority",
+            "writable": true,
+            "signer": true
+          }
+        ],
+        "args": [
+          {
+            "name": "args",
+            "type": {
+              "defined": {
+                "name": "UpdateMetadataArgs"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "verify_collection",
+        "discriminator": [
+          56,
+          113,
+          101,
+          253,
+          79,
+          55,
+          122,
+          169
+        ],
+        "accounts": [
+          {
+            "name": "metadata",
+            "writable": true
+          },
+          {
+            "name": "collection_authority",
+            "signer": true
+          }
+        ],
+        "args": []
+      }
+    ],
+    "accounts": [
+      {
+        "name": "Edition",
+        "discriminator": [
+          234,
+          117,
+          249,
+          74,
+          7,
+          99,
+          235,
+          167
+        ]
+      },
+      {
+        "name": "IncoAccount",
+        "discriminator": [
+          18,
+          233,
+          131,
+          18,
+          230,
+          173,
+          249,
+          89
+        ]
+      },
+      {
+        "name": "IncoMint",
+        "discriminator": [
+          254,
+          129,
+          245,
+          169,
+          202,
+          143,
+          198,
+          4
+        ]
+      },
+      {
+        "name": "MasterEdition",
+        "discriminator": [
+          58,
+          104,
+          215,
+          125,
+          177,
+          54,
+          116,
+          225
+        ]
+      },
+      {
+        "name": "Metadata",
+        "discriminator": [
+          72,
+          11,
+          121,
+          26,
+          111,
+          181,
+          85,
+          93
+        ]
+      }
+    ],
+    "errors": [
+      {
+        "code": 6000,
+        "name": "MissingRequiredSignature",
+        "msg": "Missing required signature for memo"
+      },
+      {
+        "code": 6001,
+        "name": "InvalidProgram",
+        "msg": "Invalid inco_lightning program"
+      }
+    ],
+    "types": [
+      {
+        "name": "AccountState",
+        "repr": {
+          "kind": "rust"
+        },
+        "type": {
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "Uninitialized"
+            },
+            {
+              "name": "Initialized"
+            },
+            {
+              "name": "Frozen"
+            }
+          ]
+        }
+      },
+      {
+        "name": "COption",
+        "generics": [
+          {
+            "kind": "type",
+            "name": "T"
+          }
+        ],
+        "type": {
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "None"
+            },
+            {
+              "name": "Some",
+              "fields": [
+                {
+                  "generic": "T"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "name": "Collection",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "verified",
+              "type": "bool"
+            },
+            {
+              "name": "key",
+              "type": "pubkey"
+            }
+          ]
+        }
+      },
+      {
+        "name": "CollectionDetails",
+        "type": {
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "V1",
+              "fields": [
+                {
+                  "name": "size",
+                  "type": "u64"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "name": "CollectionDetailsToggle",
+        "type": {
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "None"
+            },
+            {
+              "name": "Clear"
+            },
+            {
+              "name": "Set",
+              "fields": [
+                {
+                  "defined": {
+                    "name": "CollectionDetails"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "name": "CollectionToggle",
+        "type": {
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "None"
+            },
+            {
+              "name": "Clear"
+            },
+            {
+              "name": "Set",
+              "fields": [
+                {
+                  "defined": {
+                    "name": "Collection"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "name": "CreateMasterEditionArgs",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "max_supply",
+              "type": {
+                "option": "u64"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "name": "CreateMetadataArgs",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "name",
+              "type": "string"
+            },
+            {
+              "name": "symbol",
+              "type": "string"
+            },
+            {
+              "name": "uri",
+              "type": "string"
+            },
+            {
+              "name": "seller_fee_basis_points",
+              "type": "u16"
+            },
+            {
+              "name": "creators",
+              "type": {
+                "option": {
+                  "vec": {
+                    "defined": {
+                      "name": "Creator"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "is_mutable",
+              "type": "bool"
+            },
+            {
+              "name": "collection",
+              "type": {
+                "option": {
+                  "defined": {
+                    "name": "Collection"
+                  }
+                }
+              }
+            },
+            {
+              "name": "uses",
+              "type": {
+                "option": {
+                  "defined": {
+                    "name": "Uses"
+                  }
+                }
+              }
+            },
+            {
+              "name": "collection_details",
+              "type": {
+                "option": {
+                  "defined": {
+                    "name": "CollectionDetails"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "name": "Creator",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "address",
+              "type": "pubkey"
+            },
+            {
+              "name": "verified",
+              "type": "bool"
+            },
+            {
+              "name": "share",
+              "type": "u8"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Edition",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "key",
+              "type": {
+                "defined": {
+                  "name": "MetadataKey"
+                }
+              }
+            },
+            {
+              "name": "parent",
+              "type": "pubkey"
+            },
+            {
+              "name": "edition",
+              "type": "u64"
+            },
+            {
+              "name": "is_initialized",
+              "type": "bool"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Euint128",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            "u128"
+          ]
+        }
+      },
+      {
+        "name": "IncoAccount",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "mint",
+              "docs": [
+                "The mint associated with this account"
+              ],
+              "type": "pubkey"
+            },
+            {
+              "name": "owner",
+              "docs": [
+                "The owner of this account"
+              ],
+              "type": "pubkey"
+            },
+            {
+              "name": "amount",
+              "docs": [
+                "The amount of tokens this account holds (encrypted)"
+              ],
+              "type": {
+                "defined": {
+                  "name": "Euint128"
+                }
+              }
+            },
+            {
+              "name": "delegate",
+              "docs": [
+                "If `delegate` is `Some` then `delegated_amount` represents the amount authorized by the delegate"
+              ],
+              "type": {
+                "defined": {
+                  "name": "COption",
+                  "generics": [
+                    {
+                      "kind": "type",
+                      "type": "pubkey"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "state",
+              "docs": [
+                "The account's state"
+              ],
+              "type": {
+                "defined": {
+                  "name": "AccountState"
+                }
+              }
+            },
+            {
+              "name": "is_native",
+              "docs": [
+                "If is_some, this is a native token, and the value logs the rent-exempt reserve"
+              ],
+              "type": {
+                "defined": {
+                  "name": "COption",
+                  "generics": [
+                    {
+                      "kind": "type",
+                      "type": "u64"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "delegated_amount",
+              "docs": [
+                "The amount delegated (encrypted)"
+              ],
+              "type": {
+                "defined": {
+                  "name": "Euint128"
+                }
+              }
+            },
+            {
+              "name": "close_authority",
+              "docs": [
+                "Optional authority to close the account"
+              ],
+              "type": {
+                "defined": {
+                  "name": "COption",
+                  "generics": [
+                    {
+                      "kind": "type",
+                      "type": "pubkey"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "name": "IncoMint",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "mint_authority",
+              "docs": [
+                "Optional authority used to mint new tokens"
+              ],
+              "type": {
+                "defined": {
+                  "name": "COption",
+                  "generics": [
+                    {
+                      "kind": "type",
+                      "type": "pubkey"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "supply",
+              "docs": [
+                "Total supply of tokens encrypted"
+              ],
+              "type": {
+                "defined": {
+                  "name": "Euint128"
+                }
+              }
+            },
+            {
+              "name": "decimals",
+              "docs": [
+                "Number of base 10 digits to the right of the decimal place"
+              ],
+              "type": "u8"
+            },
+            {
+              "name": "is_initialized",
+              "docs": [
+                "Is `true` if this structure has been initialized"
+              ],
+              "type": "bool"
+            },
+            {
+              "name": "freeze_authority",
+              "docs": [
+                "Optional authority to freeze token accounts"
+              ],
+              "type": {
+                "defined": {
+                  "name": "COption",
+                  "generics": [
+                    {
+                      "kind": "type",
+                      "type": "pubkey"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "name": "MasterEdition",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "key",
+              "type": {
+                "defined": {
+                  "name": "MetadataKey"
+                }
+              }
+            },
+            {
+              "name": "supply",
+              "type": "u64"
+            },
+            {
+              "name": "max_supply",
+              "type": {
+                "option": "u64"
+              }
+            },
+            {
+              "name": "is_initialized",
+              "type": "bool"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Metadata",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "key",
+              "type": {
+                "defined": {
+                  "name": "MetadataKey"
+                }
+              }
+            },
+            {
+              "name": "update_authority",
+              "type": "pubkey"
+            },
+            {
+              "name": "mint",
+              "type": "pubkey"
+            },
+            {
+              "name": "name",
+              "type": "string"
+            },
+            {
+              "name": "symbol",
+              "type": "string"
+            },
+            {
+              "name": "uri",
+              "type": "string"
+            },
+            {
+              "name": "seller_fee_basis_points",
+              "type": "u16"
+            },
+            {
+              "name": "creators",
+              "type": {
+                "option": {
+                  "vec": {
+                    "defined": {
+                      "name": "Creator"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "primary_sale_happened",
+              "type": "bool"
+            },
+            {
+              "name": "is_mutable",
+              "type": "bool"
+            },
+            {
+              "name": "edition_nonce",
+              "type": {
+                "option": "u8"
+              }
+            },
+            {
+              "name": "token_standard",
+              "type": {
+                "option": {
+                  "defined": {
+                    "name": "TokenStandard"
+                  }
+                }
+              }
+            },
+            {
+              "name": "collection",
+              "type": {
+                "option": {
+                  "defined": {
+                    "name": "Collection"
+                  }
+                }
+              }
+            },
+            {
+              "name": "uses",
+              "type": {
+                "option": {
+                  "defined": {
+                    "name": "Uses"
+                  }
+                }
+              }
+            },
+            {
+              "name": "collection_details",
+              "type": {
+                "option": {
+                  "defined": {
+                    "name": "CollectionDetails"
+                  }
+                }
+              }
+            },
+            {
+              "name": "is_initialized",
+              "type": "bool"
+            }
+          ]
+        }
+      },
+      {
+        "name": "MetadataKey",
+        "type": {
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "Uninitialized"
+            },
+            {
+              "name": "MetadataV1"
+            },
+            {
+              "name": "EditionV1"
+            },
+            {
+              "name": "MasterEditionV1"
+            },
+            {
+              "name": "MasterEditionV2"
+            },
+            {
+              "name": "EditionMarker"
+            }
+          ]
+        }
+      },
+      {
+        "name": "PrintEditionArgs",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "edition",
+              "type": "u64"
+            }
+          ]
+        }
+      },
+      {
+        "name": "TokenStandard",
+        "type": {
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "NonFungible"
+            },
+            {
+              "name": "FungibleAsset"
+            },
+            {
+              "name": "Fungible"
+            },
+            {
+              "name": "NonFungibleEdition"
+            },
+            {
+              "name": "ProgrammableNonFungible"
+            }
+          ]
+        }
+      },
+      {
+        "name": "UpdateMetadataArgs",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "new_update_authority",
+              "type": {
+                "option": "pubkey"
+              }
+            },
+            {
+              "name": "name",
+              "type": {
+                "option": "string"
+              }
+            },
+            {
+              "name": "symbol",
+              "type": {
+                "option": "string"
+              }
+            },
+            {
+              "name": "uri",
+              "type": {
+                "option": "string"
+              }
+            },
+            {
+              "name": "seller_fee_basis_points",
+              "type": {
+                "option": "u16"
+              }
+            },
+            {
+              "name": "creators",
+              "type": {
+                "option": {
+                  "vec": {
+                    "defined": {
+                      "name": "Creator"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "primary_sale_happened",
+              "type": {
+                "option": "bool"
+              }
+            },
+            {
+              "name": "is_mutable",
+              "type": {
+                "option": "bool"
+              }
+            },
+            {
+              "name": "collection",
+              "type": {
+                "defined": {
+                  "name": "CollectionToggle"
+                }
+              }
+            },
+            {
+              "name": "collection_details",
+              "type": {
+                "defined": {
+                  "name": "CollectionDetailsToggle"
+                }
+              }
+            },
+            {
+              "name": "uses",
+              "type": {
+                "defined": {
+                  "name": "UsesToggle"
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "name": "UseMethod",
+        "type": {
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "Burn"
+            },
+            {
+              "name": "Multiple"
+            },
+            {
+              "name": "Single"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Uses",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "use_method",
+              "type": {
+                "defined": {
+                  "name": "UseMethod"
+                }
+              }
+            },
+            {
+              "name": "remaining",
+              "type": "u64"
+            },
+            {
+              "name": "total",
+              "type": "u64"
+            }
+          ]
+        }
+      },
+      {
+        "name": "UsesToggle",
+        "type": {
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "None"
+            },
+            {
+              "name": "Clear"
+            },
+            {
+              "name": "Set",
+              "fields": [
+                {
+                  "defined": {
+                    "name": "Uses"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  }
