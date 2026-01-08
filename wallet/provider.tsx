@@ -34,9 +34,14 @@ const WalletConnectionWrapper = dynamic(
 
 export const Wallet = ({ children }: { children: React.ReactNode }) => {
   // Use testnet explicitly
-  const endpoint = process.env.NEXT_PUBLIC_SOLANA_RPC_URL || clusterApiUrl("devnet");
+  const endpoint =
+    process.env.NEXT_PUBLIC_SOLANA_RPC_URL || clusterApiUrl("devnet");
 
-  const config: { commitment: Commitment; wsEndpoint: string; confirmTransactionInitialTimeout: number } = {
+  const config: {
+    commitment: Commitment;
+    wsEndpoint: string;
+    confirmTransactionInitialTimeout: number;
+  } = {
     commitment: "confirmed",
     wsEndpoint: endpoint.replace("https", "wss"),
     confirmTransactionInitialTimeout: 60000, // 60 seconds

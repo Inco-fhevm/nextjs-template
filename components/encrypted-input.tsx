@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { encryptValue } from '@inco/solana-sdk/encryption';
 import Mint from "./mint";
 
 const EncryptedInput = () => {
@@ -14,10 +15,12 @@ const EncryptedInput = () => {
     setFee("0");
   }, []);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     setValue(e.target.value);
     setTxHash(null); // Clear previous transaction hash when starting new input
     setEncryptedValue(""); // Clear encrypted value when input changes
+    const encrypted = await encryptValue(BigInt(value));
+    setEncryptedValue(encrypted);
   };
 
   const handleEncrypt = async () => {
@@ -115,9 +118,7 @@ const EncryptedInput = () => {
             encryptedValue={encryptedValue as `0x${string}`}
             onMintSuccess={handleMintSuccess}
           />
-          <p className="text-sm text-gray-600">
-            Fee: {fee} SOL on Solana
-          </p>
+          <p className="text-sm text-gray-600">Fee: {fee} SOL on Solana</p>
         </div>
       )}
 

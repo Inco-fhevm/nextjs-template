@@ -2,6 +2,10 @@
 
 import { ReactNode } from "react";
 
-export const WalletConnectionWrapper = ({ children }: { children: ReactNode }) => {
+export const WalletConnectionWrapper = ({
+  children,
+}: {
+  children: ReactNode;
+}) => {
   return <>{children}</>;
 };
