@@ -1,8 +1,8 @@
 import { PublicKey } from "@solana/web3.js";
-import { ENCRYPTION_CONSTANTS } from "@inco/solana-sdk";
+// import { ENCRYPTION_CONSTANTS } from "@inco/solana-sdk";
 
 export const PROGRAM_ID = new PublicKey(
-  "3pQiQfEmZsXNjQETwPRYberg9xXo7Xemgw6b4D52Rmap"
+  "7PkBc98v6bKkX8oc8Wmce6HNR5BiEt1YcRFB4DLsrPW8"
 );
 export const INCO_BASE_PROGRAM_ID = new PublicKey(
   "5sjEbPiqgZrYwR31ahR6Uk9wf5awoX61YGg7jExQSwaj"
