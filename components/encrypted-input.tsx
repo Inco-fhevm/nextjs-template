@@ -1,52 +1,142 @@
-import { useEffect, useState } from "react";
-import { encryptValue } from '@inco/solana-sdk/encryption';
-import Mint from "./mint";
+"use client";
+
+import { useState } from "react";
+import { useWallet, useConnection } from "@solana/wallet-adapter-react";
+import { encryptValue } from "@inco/solana-sdk/encryption";
+import {
+  PublicKey,
+  Transaction,
+  SystemProgram,
+  TransactionInstruction,
+} from "@solana/web3.js";
+import { Buffer } from "buffer";
+import { INCO_BASE_PROGRAM_ID, PROGRAM_ID, MINT_DISCRIMINATOR } from "@/utils/constants";
+
+// PDA helpers
+const findTokenStatePDA = () => {
+  const [pda] = PublicKey.findProgramAddressSync(
+    [Buffer.from("token_state")],
+    PROGRAM_ID
+  );
+  return pda;
+};
+
+const findBalancePDA = (owner: PublicKey) => {
+  const [pda] = PublicKey.findProgramAddressSync(
+    [Buffer.from("balance"), owner.toBuffer()],
+    PROGRAM_ID
+  );
+  return pda;
+};
 
 const EncryptedInput = () => {
+  const { publicKey, signTransaction, connected } = useWallet();
+  const { connection } = useConnection();
+
   const [value, setValue] = useState("");
   const [encryptedValue, setEncryptedValue] = useState<string>("");
   const [showFullEncrypted, setShowFullEncrypted] = useState(false);
-  const [txHash, setTxHash] = useState<`0x${string}` | null>(null);
+  const [txHash, setTxHash] = useState<string | null>(null);
   const [isEncrypting, setIsEncrypting] = useState(false);
-  const [fee, setFee] = useState<string>("0");
+  const [isMinting, setIsMinting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    // Empty effect - logic removed
-    setFee("0");
-  }, []);
-
-  const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setValue(e.target.value);
-    setTxHash(null); // Clear previous transaction hash when starting new input
-    setEncryptedValue(""); // Clear encrypted value when input changes
-    const encrypted = await encryptValue(BigInt(value));
-    setEncryptedValue(encrypted);
+    setTxHash(null);
+    setEncryptedValue("");
+    setError(null);
   };
 
   const handleEncrypt = async () => {
     if (!value) return;
 
     setIsEncrypting(true);
+    setError(null);
     try {
-      // Empty function - logic removed
-      setEncryptedValue("0xencryptedvalueplaceholder");
-    } catch (error) {
-      console.error("Encryption failed:", error);
+      const encrypted = await encryptValue(BigInt(value));
+      setEncryptedValue(encrypted);
+    } catch (err) {
+      console.error("Encryption failed:", err);
+      setError(err instanceof Error ? err.message : "Encryption failed");
     } finally {
       setIsEncrypting(false);
     }
   };
 
-  const handleMintSuccess = (hash: `0x${string}`) => {
-    setTxHash(hash);
-    setValue("");
-    setEncryptedValue("");
+  const handleMint = async () => {
+    if (!connected || !publicKey || !signTransaction || !encryptedValue) {
+      setError("Wallet not connected or no encrypted value");
+      return;
+    }
+
+    setIsMinting(true);
+    setError(null);
+
+    try {
+      // Convert encrypted hex string to buffer
+      const ciphertext = Buffer.from(encryptedValue.replace("0x", ""), "hex");
+      const inputType = 1;
+
+      // Find PDAs
+      const tokenStatePDA = findTokenStatePDA();
+      const recipientBalancePDA = findBalancePDA(publicKey);
+
+      // Create mint instruction data
+      const mintData = Buffer.concat([
+        Buffer.from(MINT_DISCRIMINATOR),
+        Buffer.from(new Uint32Array([ciphertext.length]).buffer),
+        ciphertext,
+        Buffer.from([inputType]),
+      ]);
+
+      const mintInstruction = new TransactionInstruction({
+        keys: [
+          { pubkey: tokenStatePDA, isSigner: false, isWritable: true },
+          { pubkey: recipientBalancePDA, isSigner: false, isWritable: true },
+          { pubkey: publicKey, isSigner: true, isWritable: true },
+          { pubkey: publicKey, isSigner: false, isWritable: false }, // recipient = self
+          {
+            pubkey: SystemProgram.programId,
+            isSigner: false,
+            isWritable: false,
+          },
+          { pubkey: INCO_BASE_PROGRAM_ID, isSigner: false, isWritable: false },
+        ],
+        programId: PROGRAM_ID,
+        data: mintData,
+      });
+
+      const transaction = new Transaction().add(mintInstruction);
+
+      // Get fresh blockhash
+      const { blockhash } = await connection.getLatestBlockhash("confirmed");
+      transaction.recentBlockhash = blockhash;
+      transaction.feePayer = publicKey;
+
+      const signedTransaction = await signTransaction(transaction);
+
+      const signature = await connection.sendRawTransaction(
+        signedTransaction.serialize(),
+        { skipPreflight: false, preflightCommitment: "confirmed" }
+      );
+
+      await connection.confirmTransaction(signature, "confirmed");
+
+      setTxHash(signature);
+      setValue("");
+      setEncryptedValue("");
+    } catch (err) {
+      console.error("Mint failed:", err);
+      setError(err instanceof Error ? err.message : "Failed to mint tokens");
+    } finally {
+      setIsMinting(false);
+    }
   };
 
   const copyToClipboard = async () => {
     try {
       await navigator.clipboard.writeText(encryptedValue);
-      // Could add a toast notification here
     } catch (err) {
       console.error("Failed to copy:", err);
     }
@@ -58,7 +148,7 @@ const EncryptedInput = () => {
   };
 
   const getExplorerUrl = (hash: string) => {
-    return `https://explorer.solana.com/tx/${hash}`;
+    return `https://explorer.solana.com/tx/${hash}?cluster=devnet`;
   };
 
   return (
@@ -75,13 +165,19 @@ const EncryptedInput = () => {
           />
           <button
             onClick={handleEncrypt}
-            disabled={isEncrypting || !value}
+            disabled={isEncrypting || !value || !connected}
             className="px-6 py-3 bg-blue-600 text-white rounded-full hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors whitespace-nowrap"
           >
             {isEncrypting ? "Encrypting..." : "Encrypt"}
           </button>
         </div>
       </div>
+
+      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-xl p-3">
+          <p className="text-sm text-red-600">{error}</p>
+        </div>
+      )}
 
       {encryptedValue && (
         <div>
@@ -114,11 +210,13 @@ const EncryptedInput = () => {
 
       {encryptedValue && (
         <div className="space-y-2">
-          <Mint
-            encryptedValue={encryptedValue as `0x${string}`}
-            onMintSuccess={handleMintSuccess}
-          />
-          <p className="text-sm text-gray-600">Fee: {fee} SOL on Solana</p>
+          <button
+            onClick={handleMint}
+            disabled={isMinting || !encryptedValue}
+            className="w-full bg-blue-600 text-white py-2 px-4 rounded-full hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+          >
+            {isMinting ? "Minting..." : "Mint cUSDC"}
+          </button>
         </div>
       )}
 

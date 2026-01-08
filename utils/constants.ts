@@ -1,37 +1,13 @@
-export const CERC_CONTRACT_ADDRESS =
-  "0x7bad07b6b6064dfb033207794625ffa4322cb392";
+import { PublicKey } from "@solana/web3.js";
+import { ENCRYPTION_CONSTANTS } from "@inco/solana-sdk";
 
-export const CERC_ABI = [
-  {
-    inputs: [
-      {
-        internalType: "bytes",
-        name: "encryptedAmount",
-        type: "bytes",
-      },
-    ],
-    name: "encryptedMint",
-    outputs: [],
-    stateMutability: "payable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "wallet",
-        type: "address",
-      },
-    ],
-    name: "balanceOf",
-    outputs: [
-      {
-        internalType: "euint256",
-        name: "",
-        type: "bytes32",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-] as const;
+export const PROGRAM_ID = new PublicKey(
+  "3pQiQfEmZsXNjQETwPRYberg9xXo7Xemgw6b4D52Rmap"
+);
+export const INCO_BASE_PROGRAM_ID = new PublicKey(
+  "5sjEbPiqgZrYwR31ahR6Uk9wf5awoX61YGg7jExQSwaj"
+);
+
+// Instruction discriminators
+export const INITIALIZE_DISCRIMINATOR = [175, 175, 109, 31, 13, 152, 155, 237];
+export const MINT_DISCRIMINATOR = [51, 57, 225, 47, 182, 146, 137, 166];
