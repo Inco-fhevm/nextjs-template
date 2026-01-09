@@ -21,7 +21,6 @@ import {
   getAllowancePda,
   extractHandle,
   getProgram,
-  INCO_LIGHTNING_PROGRAM_ID,
 } from "@/utils/constants";
 
 export default function EncryptedInput() {
@@ -95,7 +94,6 @@ export default function EncryptedInput() {
                 mint: kp.publicKey,
                 payer: publicKey,
                 systemProgram: SystemProgram.programId,
-                incoLightningProgram: INCO_LIGHTNING_PROGRAM_ID,
               } as any)
               .instruction()
           );
@@ -114,7 +112,6 @@ export default function EncryptedInput() {
                 owner: publicKey,
                 payer: publicKey,
                 systemProgram: SystemProgram.programId,
-                incoLightningProgram: INCO_LIGHTNING_PROGRAM_ID,
               } as any)
               .instruction()
           );
@@ -138,7 +135,6 @@ export default function EncryptedInput() {
         mint: mintPk,
         account: accPk,
         mintAuthority: publicKey,
-        incoLightningProgram: INCO_LIGHTNING_PROGRAM_ID,
         systemProgram: SystemProgram.programId,
       };
 
