@@ -1,4 +1,6 @@
 import { PublicKey, Connection } from "@solana/web3.js";
+import { Program, AnchorProvider, Idl } from "@coral-xyz/anchor";
+import { AnchorWallet } from "@solana/wallet-adapter-react";
 import bs58 from "bs58";
 import idl from "./idl.json";
 
@@ -76,4 +78,11 @@ export const fetchUserTokenAccount = async (
   return accounts.length
     ? { pubkey: accounts[0].pubkey, data: accounts[0].account.data as Buffer }
     : null;
+};
+
+export const getProgram = (connection: Connection, wallet: AnchorWallet) => {
+  const provider = new AnchorProvider(connection, wallet, {
+    commitment: "confirmed",
+  });
+  return new Program(idl as Idl, provider);
 };

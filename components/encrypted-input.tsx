@@ -1,6 +1,6 @@
 "use client";
-
 /* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { useState, useEffect, useRef } from "react";
 import {
   useWallet,
@@ -14,18 +14,17 @@ import {
   PublicKey,
   SystemProgram,
   Transaction,
-  TransactionInstruction,
 } from "@solana/web3.js";
 import {
   fetchUserMint,
   fetchUserTokenAccount,
   getAllowancePda,
   extractHandle,
+  getProgram,
   INCO_LIGHTNING_PROGRAM_ID,
 } from "@/utils/constants";
-import { getProgram } from "@/utils/program";
 
-const EncryptedInput = () => {
+export default function EncryptedInput() {
   const { publicKey, connected, sendTransaction } = useWallet();
   const { connection } = useConnection();
   const wallet = useAnchorWallet();
@@ -43,11 +42,8 @@ const EncryptedInput = () => {
     const key = publicKey?.toBase58() ?? null;
     if (key === lastWallet.current) return;
     lastWallet.current = key;
-
-    // Clear state immediately on wallet change
     setMint(null);
     setAccount(null);
-
     if (!key) return;
 
     (async () => {
@@ -58,53 +54,45 @@ const EncryptedInput = () => {
         setAccount(a?.pubkey.toBase58() ?? null);
       }
     })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [publicKey]);
+  }, [publicKey, connection]);
 
   const handleEncrypt = async () => {
     if (!value) return;
     setLoading(true);
     try {
-      const amount = BigInt(Math.floor(parseFloat(value) * 1e6));
-      setEncrypted(await encryptValue(amount));
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Encryption failed");
+      setEncrypted(
+        await encryptValue(BigInt(Math.floor(parseFloat(value) * 1e6)))
+      );
+    } catch (e: any) {
+      setError(e.message || "Encryption failed");
     }
     setLoading(false);
   };
 
   const handleMint = async () => {
-    if (!publicKey || !wallet || !encrypted) {
-      return setError("Missing data");
-    }
+    if (!publicKey || !wallet || !encrypted) return setError("Missing data");
     setLoading(true);
     setError(null);
 
     try {
       const program = getProgram(connection, wallet);
       const ciphertext = hexToBuffer(encrypted);
-      const inputType = 0;
-
       let m = mint,
         a = account;
 
-      // Step 1: Create accounts if needed (separate tx for new users)
       if (!m || !a) {
-        const initSigners: Keypair[] = [];
-        const initInstructions: TransactionInstruction[] = [];
-
-        let mintKp: Keypair | null = null;
-        let accountKp: Keypair | null = null;
+        const signers: Keypair[] = [];
+        const tx = new Transaction();
 
         if (!m) {
-          mintKp = Keypair.generate();
-          m = mintKp.publicKey.toBase58();
-          initSigners.push(mintKp);
-          initInstructions.push(
+          const kp = Keypair.generate();
+          m = kp.publicKey.toBase58();
+          signers.push(kp);
+          tx.add(
             await program.methods
               .initializeMint(6, publicKey, publicKey)
               .accounts({
-                mint: mintKp.publicKey,
+                mint: kp.publicKey,
                 payer: publicKey,
                 systemProgram: SystemProgram.programId,
                 incoLightningProgram: INCO_LIGHTNING_PROGRAM_ID,
@@ -114,14 +102,14 @@ const EncryptedInput = () => {
         }
 
         if (!a) {
-          accountKp = Keypair.generate();
-          a = accountKp.publicKey.toBase58();
-          initSigners.push(accountKp);
-          initInstructions.push(
+          const kp = Keypair.generate();
+          a = kp.publicKey.toBase58();
+          signers.push(kp);
+          tx.add(
             await program.methods
               .initializeAccount()
               .accounts({
-                account: accountKp.publicKey,
+                account: kp.publicKey,
                 mint: m,
                 owner: publicKey,
                 payer: publicKey,
@@ -132,79 +120,50 @@ const EncryptedInput = () => {
           );
         }
 
-        // Send init transaction
-        const initTx = new Transaction();
-        initTx.recentBlockhash = (
-          await connection.getLatestBlockhash()
-        ).blockhash;
-        initTx.feePayer = publicKey;
-        initInstructions.forEach((ix) => initTx.add(ix));
-        initTx.partialSign(...initSigners);
-
-        const initSig = await sendTransaction(initTx, connection);
-        await connection.confirmTransaction(initSig, "confirmed");
-
+        tx.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
+        tx.feePayer = publicKey;
+        tx.partialSign(...signers);
+        await connection.confirmTransaction(
+          await sendTransaction(tx, connection),
+          "confirmed"
+        );
         setMint(m);
         setAccount(a);
-
-        // Wait for state to propagate
         await new Promise((r) => setTimeout(r, 1000));
       }
 
-      const mintPubkey = new PublicKey(m);
-      const accountPubkey = new PublicKey(a);
+      const mintPk = new PublicKey(m),
+        accPk = new PublicKey(a);
+      const accs = {
+        mint: mintPk,
+        account: accPk,
+        mintAuthority: publicKey,
+        incoLightningProgram: INCO_LIGHTNING_PROGRAM_ID,
+        systemProgram: SystemProgram.programId,
+      };
 
-      // Step 2: Simulate mintTo to get handle
       const simTx = await program.methods
-        .mintTo(ciphertext, inputType)
-        .accounts({
-          mint: mintPubkey,
-          account: accountPubkey,
-          mintAuthority: publicKey,
-          incoLightningProgram: INCO_LIGHTNING_PROGRAM_ID,
-          systemProgram: SystemProgram.programId,
-        } as any)
+        .mintTo(ciphertext, 0)
+        .accounts(accs as any)
         .transaction();
-
       simTx.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
       simTx.feePayer = publicKey;
 
-      const simulation = await connection.simulateTransaction(
-        simTx,
-        undefined,
-        [accountPubkey]
-      );
+      const sim = await connection.simulateTransaction(simTx, undefined, [
+        accPk,
+      ]);
+      if (sim.value.err)
+        throw new Error(`Simulation failed: ${JSON.stringify(sim.value.err)}`);
 
-      if (simulation.value.err) {
-        throw new Error(
-          `Simulation failed: ${JSON.stringify(simulation.value.err)}`
-        );
-      }
+      const data = sim.value.accounts?.[0]?.data;
+      if (!data) throw new Error("No simulation data");
+      const handle = extractHandle(Buffer.from(data[0], "base64"));
+      if (!handle) throw new Error("No handle");
 
-      // Extract handle
-      let newHandle: bigint | null = null;
-      if (simulation.value.accounts?.[0]?.data) {
-        const data = Buffer.from(
-          simulation.value.accounts[0].data[0],
-          "base64"
-        );
-        newHandle = extractHandle(data);
-      }
-
-      if (!newHandle) throw new Error("Could not get handle from simulation");
-
-      // Step 3: Execute mintTo with allowance PDA
-      const [allowancePda] = getAllowancePda(newHandle, publicKey);
-
+      const [allowancePda] = getAllowancePda(handle, publicKey);
       const sig = await program.methods
-        .mintTo(ciphertext, inputType)
-        .accounts({
-          mint: mintPubkey,
-          account: accountPubkey,
-          mintAuthority: publicKey,
-          incoLightningProgram: INCO_LIGHTNING_PROGRAM_ID,
-          systemProgram: SystemProgram.programId,
-        } as any)
+        .mintTo(ciphertext, 0)
+        .accounts(accs as any)
         .remainingAccounts([
           { pubkey: allowancePda, isSigner: false, isWritable: true },
           { pubkey: publicKey, isSigner: false, isWritable: false },
@@ -215,9 +174,9 @@ const EncryptedInput = () => {
       setValue("");
       setEncrypted("");
       window.dispatchEvent(new CustomEvent("token-minted"));
-    } catch (e) {
+    } catch (e: any) {
       console.error(e);
-      setError(e instanceof Error ? e.message : "Failed");
+      setError(e.message || "Failed");
     }
     setLoading(false);
   };
@@ -233,14 +192,14 @@ const EncryptedInput = () => {
           <input
             type="number"
             placeholder="Enter amount..."
-            className="flex-1 p-3 border border-gray-300 rounded-full bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            value={value}
             onChange={(e) => {
               setValue(e.target.value);
               setTxHash(null);
               setEncrypted("");
               setError(null);
             }}
-            value={value}
+            className="flex-1 p-3 border border-gray-300 rounded-full bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <button
             onClick={handleEncrypt}
@@ -278,7 +237,6 @@ const EncryptedInput = () => {
       {error && (
         <p className="text-sm text-red-500 bg-red-50 p-3 rounded-xl">{error}</p>
       )}
-
       {txHash && (
         <div className="bg-green-50 p-3 rounded-xl">
           <p className="text-sm text-green-800">
@@ -295,6 +253,4 @@ const EncryptedInput = () => {
       )}
     </div>
   );
-};
-
-export default EncryptedInput;
+}

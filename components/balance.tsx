@@ -9,7 +9,7 @@ import {
   extractHandle,
 } from "@/utils/constants";
 
-const Balance = () => {
+export default function Balance() {
   const { publicKey, connected, signMessage } = useWallet();
   const { connection } = useConnection();
   const [balance, setBalance] = useState<string>();
@@ -18,7 +18,6 @@ const Balance = () => {
 
   const handleReadBalance = async () => {
     if (!connected || !publicKey || !signMessage) return;
-
     setLoading(true);
     setError(null);
 
@@ -26,39 +25,35 @@ const Balance = () => {
       const mint = await fetchUserMint(connection, publicKey);
       if (!mint) return setBalance("No mint");
 
-      const tokenAccount = await fetchUserTokenAccount(
+      const acc = await fetchUserTokenAccount(
         connection,
         publicKey,
         mint.pubkey
       );
-      if (!tokenAccount) return setBalance("No account");
+      if (!acc) return setBalance("No account");
 
-      const handle = extractHandle(tokenAccount.data);
+      const handle = extractHandle(acc.data);
       if (handle === BigInt(0)) return setBalance("0");
 
       const result = await decrypt([handle.toString()], {
         address: publicKey,
         signMessage,
       });
-
-      // Convert from smallest unit (6 decimals)
-      const raw = BigInt(result.plaintexts?.[0] ?? "0");
-      setBalance((Number(raw) / 1e6).toString());
-    } catch (err) {
-      console.error("Balance error:", err);
-      setError(err instanceof Error ? err.message : "Failed");
+      setBalance(
+        (Number(BigInt(result.plaintexts?.[0] ?? "0")) / 1e6).toString()
+      );
+    } catch (e) {
+      console.error(e);
+      setError(e instanceof Error ? e.message : "Failed");
     } finally {
       setLoading(false);
     }
   };
 
-  // Reset on wallet change
   useEffect(() => {
     setBalance(undefined);
     setError(null);
   }, [publicKey]);
-
-  // Hide balance after mint
   useEffect(() => {
     const onMint = () => setBalance(undefined);
     window.addEventListener("token-minted", onMint);
@@ -83,6 +78,4 @@ const Balance = () => {
       {error && <p className="text-sm text-red-500">{error}</p>}
     </div>
   );
-};
-
-export default Balance;
+}
