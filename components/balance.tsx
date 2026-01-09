@@ -36,15 +36,14 @@ const Balance = () => {
       const handle = extractHandle(tokenAccount.data);
       if (handle === BigInt(0)) return setBalance("0");
 
-      console.log("Decrypting handle:", handle.toString());
-
       const result = await decrypt([handle.toString()], {
         address: publicKey,
         signMessage,
       });
 
+      // Convert from smallest unit (6 decimals)
       const raw = BigInt(result.plaintexts?.[0] ?? "0");
-      setBalance((Number(raw) / 1e9).toString());
+      setBalance((Number(raw) / 1e6).toString());
     } catch (err) {
       console.error("Balance error:", err);
       setError(err instanceof Error ? err.message : "Failed");
@@ -53,17 +52,18 @@ const Balance = () => {
     }
   };
 
+  // Reset on wallet change
   useEffect(() => {
     setBalance(undefined);
     setError(null);
   }, [publicKey]);
 
+  // Hide balance after mint
   useEffect(() => {
-    const onMint = () => setTimeout(handleReadBalance, 3000);
+    const onMint = () => setBalance(undefined);
     window.addEventListener("token-minted", onMint);
     return () => window.removeEventListener("token-minted", onMint);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [connected, publicKey, signMessage]);
+  }, []);
 
   return (
     <div className="mt-8 space-y-4">
