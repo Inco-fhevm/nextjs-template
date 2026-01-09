@@ -1,5 +1,6 @@
 "use client";
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect, useRef } from "react";
 import {
   useWallet,
@@ -7,13 +8,19 @@ import {
   useAnchorWallet,
 } from "@solana/wallet-adapter-react";
 import { encryptValue } from "@inco/solana-sdk/encryption";
-import { Keypair, Transaction } from "@solana/web3.js";
-import { Buffer } from "buffer";
-import { fetchUserMint, fetchUserTokenAccount } from "@/utils/constants";
+import { hexToBuffer } from "@inco/solana-sdk/utils";
+import { Keypair, PublicKey, SystemProgram } from "@solana/web3.js";
+import {
+  fetchUserMint,
+  fetchUserTokenAccount,
+  getAllowancePda,
+  extractHandle,
+  INCO_LIGHTNING_PROGRAM_ID,
+} from "@/utils/constants";
 import { getProgram } from "@/utils/program";
 
 const EncryptedInput = () => {
-  const { publicKey, connected, sendTransaction } = useWallet();
+  const { publicKey, connected, signTransaction } = useWallet();
   const { connection } = useConnection();
   const wallet = useAnchorWallet();
   const lastWallet = useRef<string | null>(null);
@@ -59,68 +66,128 @@ const EncryptedInput = () => {
   };
 
   const handleMint = async () => {
-    if (!publicKey || !wallet || !encrypted) return setError("Missing data");
+    if (!publicKey || !wallet || !encrypted || !signTransaction) {
+      return setError("Missing data");
+    }
     setLoading(true);
     setError(null);
 
     try {
       const program = getProgram(connection, wallet);
-      const ciphertext = Buffer.from(encrypted.replace("0x", ""), "hex");
-      const signers: Keypair[] = [];
-      const tx = new Transaction();
+      const ciphertext = hexToBuffer(encrypted);
+      const inputType = 0;
+
       let m = mint,
         a = account;
+      let mintKp: Keypair | null = null;
+      let accountKp: Keypair | null = null;
 
+      // Create mint if needed
       if (!m) {
-        const kp = Keypair.generate();
-        tx.add(
-          await program.methods
-            .initializeMint(9, publicKey, publicKey)
-            .accounts({ mint: kp.publicKey, payer: publicKey })
-            .instruction()
-        );
-        signers.push(kp);
-        m = kp.publicKey.toBase58();
-      }
-
-      if (!a) {
-        const kp = Keypair.generate();
-        tx.add(
-          await program.methods
-            .initializeAccount()
-            .accounts({
-              account: kp.publicKey,
-              mint: m,
-              owner: publicKey,
-              payer: publicKey,
-            })
-            .instruction()
-        );
-        signers.push(kp);
-        a = kp.publicKey.toBase58();
-      }
-
-      tx.add(
+        mintKp = Keypair.generate();
         await program.methods
-          .mintTo(ciphertext, 0)
-          .accounts({ mint: m, account: a, mintAuthority: publicKey })
-          .instruction()
+          .initializeMint(9, publicKey, publicKey)
+          .accounts({
+            mint: mintKp.publicKey,
+            payer: publicKey,
+            systemProgram: SystemProgram.programId,
+            incoLightningProgram: INCO_LIGHTNING_PROGRAM_ID,
+          } as any)
+          .signers([mintKp])
+          .rpc();
+        m = mintKp.publicKey.toBase58();
+        setMint(m);
+      }
+
+      // Create account if needed
+      if (!a) {
+        accountKp = Keypair.generate();
+        await program.methods
+          .initializeAccount()
+          .accounts({
+            account: accountKp.publicKey,
+            mint: m,
+            owner: publicKey,
+            payer: publicKey,
+            systemProgram: SystemProgram.programId,
+            incoLightningProgram: INCO_LIGHTNING_PROGRAM_ID,
+          } as any)
+          .signers([accountKp])
+          .rpc();
+        a = accountKp.publicKey.toBase58();
+        setAccount(a);
+      }
+
+      const accountPubkey = new PublicKey(a);
+      const mintPubkey = new PublicKey(m);
+
+      // Step 1: Build simulation tx
+      const txForSim = await program.methods
+        .mintTo(ciphertext, inputType)
+        .accounts({
+          mint: mintPubkey,
+          account: accountPubkey,
+          mintAuthority: publicKey,
+          incoLightningProgram: INCO_LIGHTNING_PROGRAM_ID,
+          systemProgram: SystemProgram.programId,
+        } as any)
+        .transaction();
+
+      // Step 2: Sign and simulate
+      const { blockhash } = await connection.getLatestBlockhash();
+      txForSim.recentBlockhash = blockhash;
+      txForSim.feePayer = publicKey;
+      const signedSimTx = await signTransaction(txForSim);
+
+      const simulation = await connection.simulateTransaction(
+        signedSimTx,
+        undefined,
+        [accountPubkey]
       );
 
-      tx.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
-      tx.feePayer = publicKey;
-      if (signers.length) tx.partialSign(...signers);
+      if (simulation.value.err) {
+        throw new Error(
+          `Simulation failed: ${JSON.stringify(simulation.value.err)}`
+        );
+      }
 
-      const sig = await sendTransaction(tx, connection);
-      await connection.confirmTransaction(sig, "confirmed");
+      // Step 3: Extract handle from simulation
+      let newHandle: bigint | null = null;
+      if (simulation.value.accounts?.[0]?.data) {
+        const data = Buffer.from(
+          simulation.value.accounts[0].data[0],
+          "base64"
+        );
+        newHandle = extractHandle(data);
+      }
 
-      setMint(m);
-      setAccount(a);
+      if (!newHandle) throw new Error("Could not get handle from simulation");
+
+      // Step 4: Calculate allowance PDA
+      const [allowancePda] = getAllowancePda(newHandle, publicKey);
+
+      // Step 5: Execute real tx with remainingAccounts
+      const sig = await program.methods
+        .mintTo(ciphertext, inputType)
+        .accounts({
+          mint: mintPubkey,
+          account: accountPubkey,
+          mintAuthority: publicKey,
+          incoLightningProgram: INCO_LIGHTNING_PROGRAM_ID,
+          systemProgram: SystemProgram.programId,
+        } as any)
+        .remainingAccounts([
+          { pubkey: allowancePda, isSigner: false, isWritable: true },
+          { pubkey: publicKey, isSigner: false, isWritable: false },
+        ])
+        .rpc();
+
       setTxHash(sig);
       setValue("");
       setEncrypted("");
       window.dispatchEvent(new CustomEvent("token-minted"));
     } catch (e) {
+      console.error(e);
       setError(e instanceof Error ? e.message : "Failed");
     }
     setLoading(false);
