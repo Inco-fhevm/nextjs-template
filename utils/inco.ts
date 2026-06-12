@@ -6,14 +6,28 @@ import { baseSepolia } from "viem/chains";
 
 export type IncoWalletClient = WalletClient<Transport, Chain, Account>;
 
+// Optional custom RPC. Must be NEXT_PUBLIC_* to be readable in the browser;
+// when unset, the SDK / viem falls back to the public Base Sepolia endpoint.
+const RPC_URL = process.env.NEXT_PUBLIC_BASE_SEPOLIA_RPC_URL;
+
 export const publicClient = createPublicClient({
   chain: baseSepolia,
-  transport: http(),
+  transport: http(RPC_URL),
 });
 
+// Singleton Lightning instance, lazily initialized for Base Sepolia.
+let zap: Lightning | null = null;
+
 export async function getConfig() {
-  const chainId = publicClient.chain.id;
-  return Lightning.latest("devnet", chainId); // TODO: Change to testnet when testnet is available
+  if (zap) return zap;
+
+  // Base Sepolia — v1 network factory. Pass our own RPC URL when configured;
+  // otherwise the SDK falls back to viem's public endpoint.
+  zap = await Lightning.baseSepoliaTestnet(
+    RPC_URL ? { hostChainRpcUrls: [RPC_URL] } : undefined
+  );
+
+  return zap;
 }
 
 export async function encryptValue({
@@ -33,8 +47,7 @@ export async function encryptValue({
     handleType: handleTypes.euint256,
   });
 
-  console.log("Encrypted data: ", encryptedData);
-
+  // Returned as dynamic bytes, passed directly to a `bytes` contract argument.
   return encryptedData as `0x${string}`;
 }
 
@@ -65,9 +78,9 @@ export const attestedCompute = async ({
   op: (typeof AttestedComputeSupportedOps)[keyof typeof AttestedComputeSupportedOps];
   rhsPlaintext: bigint | boolean;
 }) => {
-  const incoConfig = await getConfig();
+  const inco = await getConfig();
 
-  const result = await incoConfig.attestedCompute(
+  const result = await inco.attestedCompute(
     walletClient,
     lhsHandle as `0x${string}`,
     op,
@@ -98,12 +111,12 @@ export const attestedCompute = async ({
 };
 
 /**
- * Get the fee required for Inco operations
+ * Get the per-ciphertext fee required for Inco operations.
+ * Read from the Inco executor contract bound to this deployment.
  */
 export async function getFee(): Promise<bigint> {
   const inco = await getConfig();
 
-  // Read the fee from the Lightning contract
   const fee = await publicClient.readContract({
     address: inco.executorAddress,
     abi: [
@@ -118,6 +131,5 @@ export async function getFee(): Promise<bigint> {
     functionName: "getFee",
   });
 
-  console.log("Fee: ", fee);
   return fee;
 }

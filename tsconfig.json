@@ -19,7 +19,8 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "viem": ["./node_modules/viem"]
     }
   },
   "include": [
