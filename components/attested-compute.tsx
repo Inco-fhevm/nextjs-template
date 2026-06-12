@@ -2,7 +2,7 @@
 
 import { CERC_ABI, CERC_CONTRACT_ADDRESS } from "@/utils/constants";
 import { attestedCompute } from "@/utils/inco";
-import { AttestedComputeSupportedOps } from "@inco/js/lite";
+import { AttestedComputeSupportedOps } from "@inco/lightning-js/lite";
 import { useState } from "react";
 import { parseEther } from "viem";
 import { useAccount, usePublicClient, useWalletClient } from "wagmi";

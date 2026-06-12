@@ -1,5 +1,5 @@
-import { AttestedComputeSupportedOps, Lightning } from "@inco/js/lite";
-import { handleTypes } from "@inco/js";
+import { AttestedComputeSupportedOps, Lightning } from "@inco/lightning-js/lite";
+import { handleTypes } from "@inco/lightning-js";
 import type { WalletClient, Transport, Account, Chain } from "viem";
 import { bytesToHex, createPublicClient, http, pad, toHex } from "viem";
 import { baseSepolia } from "viem/chains";

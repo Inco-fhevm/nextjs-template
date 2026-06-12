@@ -5,7 +5,7 @@
     "": {
       "name": "nextjs-template",
       "dependencies": {
-        "@inco/js": "1.0.0-rc-8",
+        "@inco/lightning-js": "1.0.0-rc-11",
         "@rainbow-me/rainbowkit": "^2.2.11",
         "@tanstack/react-query": "^5.101.0",
         "next": "16.2.9",
@@ -196,7 +196,7 @@
 
     "@img/sharp-win32-x64": ["@img/sharp-win32-x64@0.34.5", "", { "os": "win32", "cpu": "x64" }, "sha512-+29YMsqY2/9eFEiW93eqWnuLcWcufowXewwSNIT6UwZdUUCrM3oFjMWH/Z6/TMmb4hlFenmfAVbpWeup2jryCw=="],
 
-    "@inco/js": ["@inco/js@1.0.0-rc-8", "", { "dependencies": { "@bufbuild/protobuf": "2.10.0", "@connectrpc/connect": "2.1.0", "@connectrpc/connect-node": "2.1.0", "@connectrpc/connect-web": "2.1.0", "@grpc/grpc-js": "1.14.4", "@hpke/chacha20poly1305": "1.7.1", "@hpke/core": "1.7.5", "@hpke/hybridkem-x-wing": "0.6.1", "effect": "3.21.0", "sha3": "2.1.4", "viem": "2.39.3" } }, "sha512-vj6+Sd5cXgain25I7wsOC62hVZ53xiAbTFzpPQd75gc38VwVQiJNMsU5QhvLlCW4IlPZuOFs7No+CnM+l6H16w=="],
+    "@inco/lightning-js": ["@inco/lightning-js@1.0.0-rc-11", "", { "dependencies": { "@bufbuild/protobuf": "2.10.0", "@connectrpc/connect": "2.1.0", "@connectrpc/connect-node": "2.1.0", "@connectrpc/connect-web": "2.1.0", "@grpc/grpc-js": "1.14.4", "@hpke/chacha20poly1305": "1.7.1", "@hpke/core": "1.7.5", "@hpke/hybridkem-x-wing": "0.6.1", "effect": "3.21.0", "sha3": "2.1.4", "viem": "2.39.3" } }, "sha512-Q3tMuFO9rtBhCX7899DSo+oJsuC1LygpD6m/eHiViOxkwXY4ORBBWbtJRPcP7WBTy/5eFq4dgeHseTJ8NK0oMA=="],
 
     "@jridgewell/gen-mapping": ["@jridgewell/gen-mapping@0.3.13", "", { "dependencies": { "@jridgewell/sourcemap-codec": "^1.5.0", "@jridgewell/trace-mapping": "^0.3.24" } }, "sha512-2kkt/7niJ6MgEPxF0bYdQ6etZaA+fQvDcLKckhy1yIQOzaoKjBBjSj63/aLVjYE3qhRt5dvM+uUyfCg6UKCBbA=="],
 
