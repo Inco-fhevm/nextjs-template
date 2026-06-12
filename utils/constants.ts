@@ -1,5 +1,5 @@
 export const CERC_CONTRACT_ADDRESS =
-  "0x7bad07b6b6064dfb033207794625ffa4322cb392";
+  "0xe1e87e9989d6c27c89c26b0eb4d4c1298d28ed14";
 
 export const CERC_ABI = [
   {
