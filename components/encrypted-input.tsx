@@ -1,18 +1,24 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { encryptValue, getFee } from "@/utils/inco";
 import Mint from "./mint";
 import { formatEther, parseEther } from "viem";
 import { useAccount } from "wagmi";
 import { CERC_CONTRACT_ADDRESS } from "@/utils/constants";
 
-const EncryptedInput = () => {
+const EncryptedInputForAccount = ({ address }: { address?: `0x${string}` }) => {
   const [value, setValue] = useState("");
   const [encryptedValue, setEncryptedValue] = useState<string>("");
   const [showFullEncrypted, setShowFullEncrypted] = useState(false);
   const [txHash, setTxHash] = useState<`0x${string}` | null>(null);
   const [isEncrypting, setIsEncrypting] = useState(false);
-  const { address } = useAccount();
+  const encryptionRequest = useRef(0);
   const [fee, setFee] = useState<string>("0");
+
+  useEffect(() => {
+    return () => {
+      encryptionRequest.current += 1;
+    };
+  }, []);
 
   useEffect(() => {
     const fetchFee = async () => {
@@ -23,6 +29,8 @@ const EncryptedInput = () => {
   }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    encryptionRequest.current += 1;
+    setIsEncrypting(false);
     setValue(e.target.value);
     setTxHash(null); // Clear previous transaction hash when starting new input
     setEncryptedValue(""); // Clear encrypted value when input changes
@@ -31,6 +39,7 @@ const EncryptedInput = () => {
   const handleEncrypt = async () => {
     if (!value || !address) return;
 
+    const request = ++encryptionRequest.current;
     setIsEncrypting(true);
     try {
       const encryptedVal = await encryptValue({
@@ -38,11 +47,15 @@ const EncryptedInput = () => {
         address: address as `0x${string}`,
         contractAddress: CERC_CONTRACT_ADDRESS,
       });
-      setEncryptedValue(encryptedVal);
+      if (request === encryptionRequest.current) {
+        setEncryptedValue(encryptedVal);
+      }
     } catch (error) {
       console.error("Encryption failed:", error);
     } finally {
-      setIsEncrypting(false);
+      if (request === encryptionRequest.current) {
+        setIsEncrypting(false);
+      }
     }
   };
 
@@ -157,6 +170,12 @@ const EncryptedInput = () => {
       )}
     </div>
   );
+};
+
+const EncryptedInput = () => {
+  const { address } = useAccount();
+  // Amounts and ciphertexts belong to one account. Reset them on wallet changes.
+  return <EncryptedInputForAccount key={address ?? "disconnected"} address={address} />;
 };
 
 export default EncryptedInput;
